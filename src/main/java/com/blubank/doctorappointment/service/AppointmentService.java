@@ -21,46 +21,59 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final DoctorService doctorService;
     private final PatientService patientService;
+    private final DoctorConverter doctorConverter;
+    private final PatientConverter patientConverter;
+    private final AppointmentConverter appointmentConverter;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, DoctorService doctorService, PatientService patientService) {
+
+    public AppointmentService(AppointmentRepository appointmentRepository, DoctorService doctorService, PatientService patientService, PatientConverter patientConverter, DoctorConverter doctorConverter, AppointmentConverter appointmentConverter) {
         this.appointmentRepository = appointmentRepository;
         this.doctorService = doctorService;
         this.patientService = patientService;
+        this.patientConverter = patientConverter;
+        this.doctorConverter = doctorConverter;
+        this.appointmentConverter = appointmentConverter;
     }
 
-    public Page<Appointment> getAllAppointments(int page, int size) {
+    public Page<AppointmentDTO> getAllAppointments(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return appointmentRepository.findAll(pageRequest);
+
+        return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findAll(pageRequest));
     }
 
-    public Appointment getAppointmentById(Long id) {
-        return appointmentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Appointment with id " + id + " not found!"));
+    public AppointmentDTO getAppointmentByDateTime(LocalDateTime dateTime) {
+
+        return appointmentConverter.toDto(appointmentRepository.findAppointmentByAppointmentDateTime(dateTime)
+                .orElseThrow(() -> new NotFoundException("Appointment in selected time (" + dateTime + ") not found!")));
     }
 
-    public Appointment getAppointmentByDateTime(LocalDateTime dateTime) {
-        return appointmentRepository.findAppointmentByAppointmentDateTime(dateTime)
-                .orElseThrow(() -> new NotFoundException("Appointment in selected time (" + dateTime + ") not found!"));
-    }
-
-    public Page<Appointment> getAppointmentsByPatientId(Long patientId, int page, int size) {
+    public Page<AppointmentDTO> getAppointmentsByPatientPhoneNumber(String patientPhoneNumber, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return appointmentRepository.findAppointmentsByPatientId(patientId, pageRequest);
+
+        return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findAppointmentsByPatientPhoneNumber(patientPhoneNumber, pageRequest));
     }
 
-    public Page<Appointment> getOpenAppointments(LocalDate date, int page, int size) {
+    public Page<AppointmentDTO> getOpenAppointments(LocalDate date, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return appointmentRepository.findOpenAppointments(date,pageRequest);
+
+        return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findOpenAppointments(date, pageRequest));
     }
 
     //Patient
-    public Appointment takeOpenAppointment(LocalDateTime dateTime, String phoneNumber) {
-        Appointment appointment = getAppointmentByDateTime(dateTime);
+    public AppointmentDTO takeOpenAppointment(LocalDateTime dateTime, String phoneNumber) {
+
+        AppointmentDTO appointmentDTO = getAppointmentByDateTime(dateTime);
+        Appointment appointment = appointmentConverter.toEntity(appointmentDTO);
+
         if (appointment.getPatient() == null) {
-            Patient patient = patientService.getPatientByPhoneNumber(phoneNumber);
+
+            PatientDTO patientDTO = patientService.getPatientByPhoneNumber(phoneNumber);
+            Patient patient = patientConverter.toEntity(patientDTO);
             appointment.setPatient(patient);
-            return appointmentRepository.save(appointment);
+
+            return appointmentConverter.toDto(appointmentRepository.save(appointment));
         }else {
+
             throw new TakenAppointmentException();
         }
     }
@@ -85,7 +98,8 @@ public class AppointmentService {
         if (endTime.isBefore(startTime)) {
             throw new InvalidStartAndEndTimeException();
         } else {
-            Doctor doctor = doctorService.getDoctorById(doctorId);
+            DoctorDTO doctorDTO = doctorService.getDoctorById(doctorId);
+            Doctor doctor = doctorConverter.toEntity(doctorDTO);
 
             while (startTime.isBefore(endTime)) {
                 LocalDateTime nextTime = startTime.plusMinutes(30);

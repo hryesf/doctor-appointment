@@ -1,3 +1,4 @@
+/*
 package com.blubank.doctorappointment.controller;
 
 import com.blubank.doctorappointment.entity.Appointment;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Deprecated
 @RestController
 @RequestMapping(path = "api/v1/appointments")
 public class AppointmentController {
@@ -37,7 +39,9 @@ public class AppointmentController {
         }
     }
 
-    @GetMapping(path = "/select-appointment")
+    // moved to patient controller
+    */
+/*@GetMapping(path = "/select-appointment")
     ResponseEntity<Appointment> takeOpenAppointment(@RequestParam LocalDateTime dateTime,
                                                     @RequestParam String patientPhoneNumber) {
         try {
@@ -48,10 +52,10 @@ public class AppointmentController {
     }
 
     @GetMapping(path = "/patient/{patient_id}")
-    ResponseEntity<Page<Appointment>> getAppointmentsByPatientId(@PathVariable("patient_id") Long patientId,
+    ResponseEntity<Page<Appointment>> getAppointmentsByPatientPhoneNumber(@PathVariable("patient_id") Long patientId,
                                                                  @RequestParam int page,
                                                                  @RequestParam int size) {
-        return new ResponseEntity<>(appointmentService.getAppointmentsByPatientId(patientId, page, size), HttpStatus.OK);
+        return new ResponseEntity<>(appointmentService.getAppointmentsByPatientPhoneNumber(patientId, page, size), HttpStatus.OK);
     }
 
     @GetMapping(path = "/open-appointments/{date}")
@@ -59,9 +63,12 @@ public class AppointmentController {
                                                           @RequestParam int page,
                                                           @RequestParam int size) {
         return new ResponseEntity<>(appointmentService.getOpenAppointments(date, page, size), HttpStatus.OK);
-    }
+    }*//*
 
-    @PostMapping
+
+    // moved to doctor controller
+    */
+/*@PostMapping
     ResponseEntity<String> saveAppointments(@RequestParam Long doctorId,
                                             LocalDateTime startTime,
                                             LocalDateTime endTime) {
@@ -86,6 +93,8 @@ public class AppointmentController {
         } catch (TakenAppointmentException e2) {
             throw new TakenAppointmentException();
         }
-    }
+    }*//*
+
 
 }
+*/

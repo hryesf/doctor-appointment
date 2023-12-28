@@ -13,27 +13,29 @@ import java.util.Optional;
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final PatientConverter patientConverter;
 
-    public PatientService(PatientRepository patientRepository) {
+    public PatientService(PatientRepository patientRepository, PatientConverter patientConverter) {
         this.patientRepository = patientRepository;
+        this.patientConverter = patientConverter;
     }
 
-    public Page<Patient> getAllPatients(int page, int size) {
+    public Page<PatientDTO> getAllPatients(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return patientRepository.findAll(pageRequest);
+        return patientConverter.PatientDTOPaginated(patientRepository.findAll(pageRequest));
     }
 
-    public Patient getPatientById(Long id) {
-        return patientRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Patient with id = " + id + " not found!"));
+    public PatientDTO getPatientById(Long id) {
+        return patientConverter.toDto(patientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Patient with id = " + id + " not found!")));
     }
 
-    public Patient getPatientByPhoneNumber(String phoneNumber) {
-        return patientRepository.findPatientByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new NotFoundException("Patient with phone number \" " + phoneNumber + "\" not Found"));
+    public PatientDTO getPatientByPhoneNumber(String phoneNumber) {
+        return patientConverter.toDto(patientRepository.findPatientByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new NotFoundException("Patient with phone number \" " + phoneNumber + "\" not Found")));
     }
 
-    public Patient savePatient(Patient patient) {
+    public PatientDTO savePatient(Patient patient) {
 
         if (patient.getFullName().isEmpty()){
             throw new EmptyFullNameException();
@@ -55,7 +57,7 @@ public class PatientService {
                     throw new TakenPhoneNumberException();
                 }
             } else {
-                return patientRepository.save(patient);
+                return patientConverter.toDto(patientRepository.save(patient));
             }
         }
     }

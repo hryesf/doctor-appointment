@@ -17,8 +17,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("SELECT a FROM Appointment a WHERE a.patient IS NULL AND DATE(a.appointmentDateTime) = :date")
     Page<Appointment> findOpenAppointments(@Param("date") LocalDate date, PageRequest pageRequest);
-
     Optional<Appointment> findAppointmentByAppointmentDateTime(LocalDateTime dateTime);
-    Page<Appointment> findAppointmentsByPatientId(Long patientId, PageRequest pageRequest);
+    Page<Appointment> findAppointmentsByPatientPhoneNumber(String patientPhoneNumber, PageRequest pageRequest);
+
 
 }

@@ -14,22 +14,24 @@ import java.util.Optional;
 @Service
 public class DoctorService {
     private final DoctorRepository doctorRepository;
+    private final DoctorConverter doctorConverter;
 
-    public DoctorService(DoctorRepository doctorRepository) {
+    public DoctorService(DoctorRepository doctorRepository, DoctorConverter doctorConverter) {
         this.doctorRepository = doctorRepository;
+        this.doctorConverter = doctorConverter;
     }
 
-    public Page<Doctor> getAllDoctors(int page, int size) {
+    public Page<DoctorDTO> getAllDoctors(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return doctorRepository.findAll(pageRequest);
+        return doctorConverter.doctorDTOPaginated(doctorRepository.findAll(pageRequest));
     }
 
-    public Doctor getDoctorById(Long id) {
-        return doctorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Doctor with id = " + id + " not found!"));
+    public DoctorDTO getDoctorById(Long id) {
+        return doctorConverter.toDto(doctorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Doctor with id = " + id + " not found!")));
     }
 
-    public Doctor saveDoctor(Doctor doctor) throws DuplicateDoctorException, TakenMedicalCodeException {
+    public DoctorDTO saveDoctor(Doctor doctor) throws DuplicateDoctorException, TakenMedicalCodeException {
 
         String medicalCode = doctor.getMedicalCode();
         String fullName = doctor.getFullName();
@@ -42,7 +44,7 @@ public class DoctorService {
                 throw new TakenMedicalCodeException();
             }
         } else {
-            return doctorRepository.save(doctor);
+            return doctorConverter.toDto(doctorRepository.save(doctor));
         }
     }
 
