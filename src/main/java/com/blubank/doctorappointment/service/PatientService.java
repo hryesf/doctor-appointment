@@ -3,9 +3,10 @@ package com.blubank.doctorappointment.service;
 import com.blubank.doctorappointment.entity.Patient;
 import com.blubank.doctorappointment.exception.*;
 import com.blubank.doctorappointment.repository.PatientRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,8 +18,9 @@ public class PatientService {
         this.patientRepository = patientRepository;
     }
 
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    public Page<Patient> getAllPatients(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return patientRepository.findAll(pageRequest);
     }
 
     public Patient getPatientById(Long id) {

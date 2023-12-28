@@ -5,12 +5,12 @@ import com.blubank.doctorappointment.entity.Patient;
 import com.blubank.doctorappointment.exception.*;
 import com.blubank.doctorappointment.service.AppointmentService;
 import com.blubank.doctorappointment.service.PatientService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/v1/patients")
@@ -25,8 +25,8 @@ public class PatientController {
     }
 
     @GetMapping
-    ResponseEntity<List<Patient>> getAllPatients() {
-        return new ResponseEntity<>(patientService.getAllPatients(), HttpStatus.OK);
+    ResponseEntity<Page<Patient>> getAllPatients(@RequestParam int page, @RequestParam int size) {
+        return new ResponseEntity<>(patientService.getAllPatients(page, size), HttpStatus.OK);
     }
 
     @GetMapping(path = "/{patient_id}")
@@ -40,10 +40,12 @@ public class PatientController {
     }
 
     @GetMapping(path = "/patient-appointments/{phone_number}")
-    ResponseEntity<List<Appointment>> getPatientAppointments(@PathVariable("phone_number") String phoneNumber) {
+    ResponseEntity<Page<Appointment>> getPatientAppointments(@PathVariable("phone_number") String phoneNumber,
+                                                             @RequestParam int page,
+                                                             @RequestParam int size) {
         try {
             Patient patient = patientService.getPatientByPhoneNumber(phoneNumber);
-            return new ResponseEntity<>(appointmentService.getAppointmentsByPatientId(patient.getId()), HttpStatus.OK);
+            return new ResponseEntity<>(appointmentService.getAppointmentsByPatientId(patient.getId(), page, size), HttpStatus.OK);
 
         } catch (NotFoundException e) {
             throw new NotFoundException(e.getMessage());

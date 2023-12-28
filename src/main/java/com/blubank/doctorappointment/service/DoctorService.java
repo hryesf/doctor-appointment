@@ -1,11 +1,14 @@
 package com.blubank.doctorappointment.service;
 
 import com.blubank.doctorappointment.entity.Doctor;
-import com.blubank.doctorappointment.exception.*;
+import com.blubank.doctorappointment.exception.DuplicateDoctorException;
+import com.blubank.doctorappointment.exception.NotFoundException;
+import com.blubank.doctorappointment.exception.TakenMedicalCodeException;
 import com.blubank.doctorappointment.repository.DoctorRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,8 +19,9 @@ public class DoctorService {
         this.doctorRepository = doctorRepository;
     }
 
-    public List<Doctor> getAllDoctors() {
-        return doctorRepository.findAll();
+    public Page<Doctor> getAllDoctors(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return doctorRepository.findAll(pageRequest);
     }
 
     public Doctor getDoctorById(Long id) {

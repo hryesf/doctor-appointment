@@ -5,13 +5,13 @@ import com.blubank.doctorappointment.exception.InvalidStartAndEndTimeException;
 import com.blubank.doctorappointment.exception.NotFoundException;
 import com.blubank.doctorappointment.exception.TakenAppointmentException;
 import com.blubank.doctorappointment.service.AppointmentService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/v1/appointments")
@@ -23,12 +23,13 @@ public class AppointmentController {
     }
 
     @GetMapping
-    ResponseEntity<List<Appointment>> getAllAppointments() {
-        return new ResponseEntity<>(appointmentService.getAllAppointments(), HttpStatus.OK);
+    ResponseEntity<Page<Appointment>> getAllAppointments(@RequestParam int page,
+                                                         @RequestParam int size) {
+        return new ResponseEntity<>(appointmentService.getAllAppointments(page, size), HttpStatus.OK);
     }
 
     @GetMapping(path = "/{appointment_id}")
-    ResponseEntity<Appointment> getAppointmentsById(@PathVariable("appointment_id") Long appointmentId) {
+    ResponseEntity<Appointment> getAppointmentById(@PathVariable("appointment_id") Long appointmentId) {
         try {
             return new ResponseEntity<>(appointmentService.getAppointmentById(appointmentId), HttpStatus.OK);
         } catch (NotFoundException e) {
@@ -37,7 +38,8 @@ public class AppointmentController {
     }
 
     @GetMapping(path = "/select-appointment")
-    ResponseEntity<Appointment> takeOpenAppointment(@RequestParam LocalDateTime dateTime, @RequestParam String patientPhoneNumber) {
+    ResponseEntity<Appointment> takeOpenAppointment(@RequestParam LocalDateTime dateTime,
+                                                    @RequestParam String patientPhoneNumber) {
         try {
             return new ResponseEntity<>(appointmentService.takeOpenAppointment(dateTime, patientPhoneNumber), HttpStatus.OK);
         } catch (TakenAppointmentException e) {
@@ -46,13 +48,17 @@ public class AppointmentController {
     }
 
     @GetMapping(path = "/patient/{patient_id}")
-    ResponseEntity<List<Appointment>> getAppointmentsByPatientId(@PathVariable("patient_id") Long patientId) {
-        return new ResponseEntity<>(appointmentService.getAppointmentsByPatientId(patientId), HttpStatus.OK);
+    ResponseEntity<Page<Appointment>> getAppointmentsByPatientId(@PathVariable("patient_id") Long patientId,
+                                                                 @RequestParam int page,
+                                                                 @RequestParam int size) {
+        return new ResponseEntity<>(appointmentService.getAppointmentsByPatientId(patientId, page, size), HttpStatus.OK);
     }
 
     @GetMapping(path = "/open-appointments/{date}")
-    ResponseEntity<List<Appointment>> getOpenAppointments(@PathVariable("date") LocalDate date) {
-        return new ResponseEntity<>(appointmentService.getOpenAppointments(date), HttpStatus.OK);
+    ResponseEntity<Page<Appointment>> getOpenAppointments(@PathVariable("date") LocalDate date,
+                                                          @RequestParam int page,
+                                                          @RequestParam int size) {
+        return new ResponseEntity<>(appointmentService.getOpenAppointments(date, page, size), HttpStatus.OK);
     }
 
     @PostMapping

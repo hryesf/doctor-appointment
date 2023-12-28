@@ -7,12 +7,13 @@ import com.blubank.doctorappointment.exception.InvalidStartAndEndTimeException;
 import com.blubank.doctorappointment.exception.NotFoundException;
 import com.blubank.doctorappointment.exception.TakenAppointmentException;
 import com.blubank.doctorappointment.repository.AppointmentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class AppointmentService {
@@ -27,8 +28,9 @@ public class AppointmentService {
         this.patientService = patientService;
     }
 
-    public List<Appointment> getAllAppointments() {
-        return appointmentRepository.findAll();
+    public Page<Appointment> getAllAppointments(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return appointmentRepository.findAll(pageRequest);
     }
 
     public Appointment getAppointmentById(Long id) {
@@ -41,12 +43,14 @@ public class AppointmentService {
                 .orElseThrow(() -> new NotFoundException("Appointment in selected time (" + dateTime + ") not found!"));
     }
 
-    public List<Appointment> getAppointmentsByPatientId(Long patientId) {
-        return appointmentRepository.findAppointmentsByPatientId(patientId);
+    public Page<Appointment> getAppointmentsByPatientId(Long patientId, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return appointmentRepository.findAppointmentsByPatientId(patientId, pageRequest);
     }
 
-    public List<Appointment> getOpenAppointments(LocalDate date) {
-        return appointmentRepository.findOpenAppointments(date);
+    public Page<Appointment> getOpenAppointments(LocalDate date, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return appointmentRepository.findOpenAppointments(date,pageRequest);
     }
 
     //Patient

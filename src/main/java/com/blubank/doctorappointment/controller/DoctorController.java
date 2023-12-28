@@ -5,12 +5,12 @@ import com.blubank.doctorappointment.exception.DuplicateDoctorException;
 import com.blubank.doctorappointment.exception.NotFoundException;
 import com.blubank.doctorappointment.exception.TakenMedicalCodeException;
 import com.blubank.doctorappointment.service.DoctorService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/v1/doctors")
@@ -23,8 +23,8 @@ public class DoctorController {
     }
 
     @GetMapping
-    ResponseEntity<List<Doctor>> getAllMembers() {
-        return new ResponseEntity<>(doctorService.getAllDoctors(), HttpStatus.OK);
+    ResponseEntity<Page<Doctor>> getAllMembers(@RequestParam int page, @RequestParam int size) {
+        return new ResponseEntity<>(doctorService.getAllDoctors(page, size), HttpStatus.OK);
     }
 
     @GetMapping(path = "/{doctor_id}")
