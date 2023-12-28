@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -37,36 +38,29 @@ public class PatientService {
 
     public PatientDTO savePatient(Patient patient) {
 
-        if (patient.getFullName().isEmpty()){
-            throw new EmptyFullNameException();
+        String phoneNumber = patient.getPhoneNumber();
+        String fullName = patient.getFullName();
 
-        } else if (patient.getPhoneNumber().isEmpty()) {
-            throw new EmptyPhoneNumberException();
+        Optional<Patient> patientOptional = patientRepository.findPatientByPhoneNumber(phoneNumber);
 
-        }else {
-
-            String phoneNumber = patient.getPhoneNumber();
-            String fullName = patient.getFullName();
-
-            Optional<Patient> patientOptional = patientRepository.findPatientByPhoneNumber(phoneNumber);
-
-            if (patientOptional.isPresent()) {
-                if (patientOptional.get().getFullName().equals(fullName)) {
-                    throw new DuplicatePatientException("Patient with name \"" + fullName + "\" and phone number \"" + phoneNumber + "\" is already registered!");
-                } else {
-                    throw new TakenPhoneNumberException();
-                }
+        if (patientOptional.isPresent()) {
+            if (patientOptional.get().getFullName().equals(fullName)) {
+                throw new DuplicatePatientException("Patient with name \"" + fullName + "\" and phone number \"" + phoneNumber + "\" is already registered!");
             } else {
-                return patientConverter.toDto(patientRepository.save(patient));
+                throw new TakenPhoneNumberException();
             }
+        } else {
+            patient.setCreatedAt(LocalDateTime.now());
+            return patientConverter.toDto(patientRepository.save(patient));
         }
+
     }
 
     public String deletePatientById(Long id) {
-        if (patientRepository.findById(id).isPresent()){
+        if (patientRepository.findById(id).isPresent()) {
             patientRepository.deleteById(id);
             return "Patient with code " + id + " removed";
-        }else {
+        } else {
             throw new NotFoundException("Patient with id =  " + id + " not found!");
         }
     }

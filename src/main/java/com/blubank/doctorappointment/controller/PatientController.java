@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -28,8 +31,11 @@ public class PatientController {
     }
 
     @GetMapping
-    ResponseEntity<Page<PatientDTO>> getAllPatients(@RequestParam int page, @RequestParam int size) {
-        Page<PatientDTO> patients = patientService.getAllPatients(page, size);
+    ResponseEntity<Page<PatientDTO>> getAllPatients(@RequestParam(defaultValue = "1") String page,
+                                                    @RequestParam(defaultValue = "10") String size) {
+        int pageNumber = Integer.parseInt(page);
+        int sizeNumber = Integer.parseInt(size);
+        Page<PatientDTO> patients = patientService.getAllPatients(pageNumber, sizeNumber);
 
         return new ResponseEntity<>(patients, HttpStatus.OK);
     }
@@ -46,11 +52,14 @@ public class PatientController {
 
     @GetMapping(path = "/patient-appointments/{phone_number}")
     ResponseEntity<Page<AppointmentDTO>> getPatientAppointments(@PathVariable("phone_number") String phoneNumber,
-                                                                @RequestParam int page,
-                                                                @RequestParam int size) {
+                                                                @RequestParam(defaultValue = "1") String page,
+                                                                @RequestParam(defaultValue = "10") String size) {
+        int pageNumber = Integer.parseInt(page);
+        int sizeNumber = Integer.parseInt(size);
         try {
             PatientDTO patientDTO = patientService.getPatientByPhoneNumber(phoneNumber);
-            return new ResponseEntity<>(appointmentService.getAppointmentsByPatientPhoneNumber(patientDTO.getPhoneNumber(), page, size),
+            return new ResponseEntity<>(
+                    appointmentService.getAppointmentsByPatientPhoneNumber(patientDTO.getPhoneNumber(), pageNumber, sizeNumber),
                     HttpStatus.OK);
 
         } catch (NotFoundException e) {
@@ -59,20 +68,14 @@ public class PatientController {
     }
 
     @PostMapping
-    ResponseEntity<PatientDTO> savePatient(@Valid @RequestBody Patient newPatient) {
+    ResponseEntity<PatientDTO> savePatient(@Valid @RequestBody @NotNull Patient newPatient) {
         try {
             return new ResponseEntity<>(patientService.savePatient(newPatient), HttpStatus.OK);
 
-        } catch (EmptyFullNameException e) {
-            throw new EmptyFullNameException();
+        } catch (DuplicatePatientException e) {
+            throw new DuplicatePatientException(e.getMessage());
 
-        } catch (EmptyPhoneNumberException e2) {
-            throw new EmptyPhoneNumberException();
-
-        } catch (DuplicatePatientException e3) {
-            throw new DuplicatePatientException(e3.getMessage());
-
-        } catch (TakenPhoneNumberException e4) {
+        } catch (TakenPhoneNumberException e1) {
             throw new TakenPhoneNumberException();
         }
     }
@@ -91,23 +94,27 @@ public class PatientController {
     @GetMapping(path = "/patient/{patient_phoneNumber}")
     ResponseEntity<Page<AppointmentDTO>> getAppointmentsByPatientPhoneNumber(
             @PathVariable("patient_phoneNumber") String phoneNumber,
-            @RequestParam int page,
-            @RequestParam int size) {
-        return new ResponseEntity<>(appointmentService.getAppointmentsByPatientPhoneNumber(phoneNumber, page, size),
+            @RequestParam(defaultValue = "1") String page,
+            @RequestParam(defaultValue = "10") String size) {
+        int pageNumber = Integer.parseInt(page);
+        int sizeNumber = Integer.parseInt(size);
+        return new ResponseEntity<>(appointmentService.getAppointmentsByPatientPhoneNumber(phoneNumber, pageNumber, sizeNumber),
                 HttpStatus.OK);
     }
 
     @GetMapping(path = "/open-appointments/{date}")
     ResponseEntity<Page<AppointmentDTO>> getOpenAppointments(@PathVariable("date") LocalDate date,
-                                                          @RequestParam int page,
-                                                          @RequestParam int size) {
-        return new ResponseEntity<>(appointmentService.getOpenAppointments(date, page, size),
+                                                             @RequestParam(defaultValue = "1") String page,
+                                                             @RequestParam(defaultValue = "10") String size) {
+        int pageNumber = Integer.parseInt(page);
+        int sizeNumber = Integer.parseInt(size);
+        return new ResponseEntity<>(appointmentService.getOpenAppointments(date, pageNumber, sizeNumber),
                 HttpStatus.OK);
     }
 
     @GetMapping(path = "/select-appointment")
-    ResponseEntity<AppointmentDTO> takeOpenAppointment(@RequestParam LocalDateTime dateTime,
-                                                    @RequestParam String patientPhoneNumber) {
+    ResponseEntity<AppointmentDTO> takeOpenAppointment(@Valid @RequestParam @Future LocalDateTime dateTime,
+                                                       @Valid @RequestParam @NotNull @NotBlank String patientPhoneNumber) {
         try {
             return new ResponseEntity<>(appointmentService.takeOpenAppointment(dateTime, patientPhoneNumber),
                     HttpStatus.OK);

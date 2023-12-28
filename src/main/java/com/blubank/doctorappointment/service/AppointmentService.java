@@ -69,9 +69,12 @@ public class AppointmentService {
 
             PatientDTO patientDTO = patientService.getPatientByPhoneNumber(phoneNumber);
             Patient patient = patientConverter.toEntity(patientDTO);
+
             appointment.setPatient(patient);
+            appointment.setUpdatedAt(LocalDateTime.now());
 
             return appointmentConverter.toDto(appointmentRepository.save(appointment));
+
         }else {
 
             throw new TakenAppointmentException();

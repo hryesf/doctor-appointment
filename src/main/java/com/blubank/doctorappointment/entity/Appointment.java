@@ -1,6 +1,7 @@
 package com.blubank.doctorappointment.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -8,14 +9,11 @@ import javax.validation.constraints.Future;
 import java.time.LocalDateTime;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Entity(name = "Appointment")
 @Table(name = "appointment")
-public class Appointment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "appointment_id")
-    private Long appointmentId;
+public class Appointment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("doctorId")
@@ -37,5 +35,6 @@ public class Appointment {
     public Appointment(Doctor doctor, LocalDateTime appointmentDateTime) {
         this.doctor = doctor;
         this.appointmentDateTime = appointmentDateTime;
+        this.setCreatedAt(LocalDateTime.now());
     }
 }

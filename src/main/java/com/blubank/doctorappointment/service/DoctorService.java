@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Service
 public class DoctorService {
@@ -31,29 +31,32 @@ public class DoctorService {
                 .orElseThrow(() -> new NotFoundException("Doctor with id = " + id + " not found!")));
     }
 
-    public DoctorDTO saveDoctor(Doctor doctor) throws DuplicateDoctorException, TakenMedicalCodeException {
+    public DoctorDTO saveDoctor(Doctor doctor) {
 
         String medicalCode = doctor.getMedicalCode();
         String fullName = doctor.getFullName();
 
-        Optional<Doctor> doctorOptional = doctorRepository.findByMedicalCode(medicalCode);
-        if (doctorOptional.isPresent()) {
-            if (doctorOptional.get().getFullName().equals(fullName)) {
-                throw new DuplicateDoctorException("Doctor with name \"" + fullName + "\" and medical code \"" + medicalCode + "\" is already exists!");
-            } else {
-                throw new TakenMedicalCodeException();
-            }
-        } else {
-            return doctorConverter.toDto(doctorRepository.save(doctor));
-        }
+        doctorRepository.findByMedicalCode(medicalCode)
+                .ifPresent(existingDoctor -> {
+                    if (existingDoctor.getFullName().equals(fullName)) {
+                        throw new DuplicateDoctorException("Doctor with name \"" + fullName + "\" and medical code \"" + medicalCode + "\" already exists!");
+                    } else {
+                        throw new TakenMedicalCodeException();
+                    }
+                });
+
+        doctor.setCreatedAt(LocalDateTime.now());
+        return doctorConverter.toDto(doctorRepository.save(doctor));
+
     }
 
     public String deleteDoctorById(Long id) {
-        if (doctorRepository.findById(id).isEmpty()) {
-            throw new NotFoundException("Appointment with id = " + id + " not found!");
-        }else {
-            doctorRepository.deleteById(id);
-            return "Doctor with code = " + id + " removed";
+
+        if (!doctorRepository.existsById(id)) {
+            throw new NotFoundException("Doctor with id = " + id + " not found!");
         }
+        doctorRepository.deleteById(id);
+        return "Doctor with code = " + id + " removed";
+
     }
 }

@@ -1,17 +1,18 @@
 package com.blubank.doctorappointment.controller;
 
 import com.blubank.doctorappointment.entity.Doctor;
-import com.blubank.doctorappointment.exception.*;
 import com.blubank.doctorappointment.service.AppointmentDTO;
 import com.blubank.doctorappointment.service.AppointmentService;
 import com.blubank.doctorappointment.service.DoctorDTO;
 import com.blubank.doctorappointment.service.DoctorService;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @RestController
@@ -27,74 +28,41 @@ public class DoctorController {
     }
 
     @GetMapping
-    ResponseEntity<Page<DoctorDTO>> getAllDoctors(@RequestParam int page, @RequestParam int size) {
-        return new ResponseEntity<>(doctorService.getAllDoctors(page, size), HttpStatus.OK);
+    ResponseEntity<Page<DoctorDTO>> getAllDoctors(@RequestParam(defaultValue = "1") int page,
+                                                  @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(doctorService.getAllDoctors(page, size));
     }
 
     @GetMapping(path = "/{doctor_id}")
     ResponseEntity<DoctorDTO> getDoctorById(@PathVariable("doctor_id") Long id) {
-        try {
-            return new ResponseEntity<>(doctorService.getDoctorById(id), HttpStatus.OK);
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        }
+        return ResponseEntity.ok(doctorService.getDoctorById(id));
     }
 
     @PostMapping
-    ResponseEntity<DoctorDTO> saveDoctor(@Valid @RequestBody Doctor newDoctor) {
-        try {
-            return new ResponseEntity<>(doctorService.saveDoctor(newDoctor), HttpStatus.OK);
-
-        } catch (DuplicateDoctorException e) {
-            throw new DuplicateDoctorException(e.getMessage());
-
-        } catch (TakenMedicalCodeException e2) {
-            throw new TakenMedicalCodeException();
-        }
+    ResponseEntity<DoctorDTO> saveDoctor(@Valid @RequestBody @NotNull Doctor newDoctor) {
+        return ResponseEntity.ok(doctorService.saveDoctor(newDoctor));
     }
 
     @DeleteMapping(path = "/{doctor_id}")
     ResponseEntity<String> deleteDoctorById(@PathVariable("doctor_id") Long id) {
-        try {
-            return new ResponseEntity<>(doctorService.deleteDoctorById(id), HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-
-        }
+        return ResponseEntity.ok(doctorService.deleteDoctorById(id));
     }
 
-    // related to Appointments
     @PostMapping("/add-appointments")
-    ResponseEntity<String> saveAppointments(@RequestParam Long doctorId,
-                                            LocalDateTime startTime,
-                                            LocalDateTime endTime) {
-        try {
-            return new ResponseEntity<>(appointmentService.saveAppointments(doctorId, startTime, endTime),
-                    HttpStatus.OK);
-
-        } catch (InvalidStartAndEndTimeException e) {
-            throw new InvalidStartAndEndTimeException();
-        }
+    ResponseEntity<String> saveAppointments(@Valid @RequestParam @NotNull @NotBlank Long doctorId,
+                                            @Valid @RequestParam @NotNull @NotBlank @Future LocalDateTime startTime,
+                                            @Valid @RequestParam @NotNull @NotBlank @Future LocalDateTime endTime) {
+        return ResponseEntity.ok(appointmentService.saveAppointments(doctorId, startTime, endTime));
     }
-
 
     @DeleteMapping(path = "/{appointment_id}")
     ResponseEntity<String> deleteAppointmentById(@PathVariable("appointment_id") Long id) {
-        try {
-            return new ResponseEntity<>(appointmentService.deleteAppointmentById(id), HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-
-        } catch (TakenAppointmentException e2) {
-            throw new TakenAppointmentException();
-        }
+        return ResponseEntity.ok(appointmentService.deleteAppointmentById(id));
     }
 
     @GetMapping
-    ResponseEntity<Page<AppointmentDTO>> getAllAppointments(@RequestParam int page,
-                                                            @RequestParam int size) {
-        return new ResponseEntity<>(appointmentService.getAllAppointments(page, size), HttpStatus.OK);
+    ResponseEntity<Page<AppointmentDTO>> getAllAppointments(@RequestParam(defaultValue = "1") int page,
+                                                            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(appointmentService.getAllAppointments(page, size));
     }
 }

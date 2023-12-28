@@ -5,59 +5,44 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.ZonedDateTime;
 
 @ControllerAdvice
 public class APIExceptionHandler {
 
-    @ExceptionHandler(value = {NotFoundException.class})
-    public ResponseEntity<Object> handleNotFoundException(NotFoundException e) {
-        return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
-    @ExceptionHandler(value = {EmptyFullNameException.class})
-    public ResponseEntity<Object> handleEmptyFullNameException(EmptyFullNameException e) {
-        return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(DuplicateDoctorException.class)
+    public ResponseEntity<String> handleDuplicateDoctorException(DuplicateDoctorException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
-    @ExceptionHandler(value = {EmptyPhoneNumberException.class})
-    public ResponseEntity<Object> handleEmptyPhoneNumberException(EmptyPhoneNumberException e) {
-        return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(TakenMedicalCodeException.class)
+    public ResponseEntity<String> handleTakenMedicalCodeException(TakenMedicalCodeException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(value = {InvalidStartAndEndTimeException.class})
-    public ResponseEntity<Object> handleInvalidStartAndEndTimeException(InvalidStartAndEndTimeException e) {
-        return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleInvalidStartAndEndTimeException(InvalidStartAndEndTimeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
-    @ExceptionHandler(value = {DuplicateDoctorException.class})
-    public ResponseEntity<Object> handleDuplicateDoctorException(DuplicateDoctorException e) {
-        return buildResponseEntity(e, HttpStatus.CONFLICT);
-    }
 
     @ExceptionHandler(value = {DuplicatePatientException.class})
-    public ResponseEntity<Object> handleDuplicatePatientException(DuplicatePatientException e) {
-        return buildResponseEntity(e, HttpStatus.CONFLICT);
+    public ResponseEntity<String> handleDuplicatePatientException(DuplicatePatientException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(value = {TakenAppointmentException.class})
-    public ResponseEntity<Object> handleTakenAppointmentException(TakenAppointmentException e) {
-        return buildResponseEntity(e, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(value = {TakenMedicalCodeException.class})
-    public ResponseEntity<Object> handleTakenMedicalCodeException(TakenMedicalCodeException e) {
-        return buildResponseEntity(e, HttpStatus.CONFLICT);
+    public ResponseEntity<String> handleTakenAppointmentException(TakenAppointmentException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(value = {TakenPhoneNumberException.class})
-    public ResponseEntity<Object> handleTakenPhoneNumberException(TakenPhoneNumberException e) {
-        return buildResponseEntity(e, HttpStatus.CONFLICT);
-    }
-
-    private ResponseEntity<Object> buildResponseEntity(Exception exception, HttpStatus status) {
-        APIException apiException = new APIException(exception.getMessage(), status, ZonedDateTime.now());
-        return new ResponseEntity<>(apiException, status);
+    public ResponseEntity<String> handleTakenPhoneNumberException(TakenPhoneNumberException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
 }
