@@ -3,9 +3,7 @@ package com.blubank.doctorappointment.service;
 import com.blubank.doctorappointment.entity.Appointment;
 import com.blubank.doctorappointment.entity.Doctor;
 import com.blubank.doctorappointment.entity.Patient;
-import com.blubank.doctorappointment.exception.InvalidStartAndEndTimeException;
-import com.blubank.doctorappointment.exception.NotFoundException;
-import com.blubank.doctorappointment.exception.TakenAppointmentException;
+import com.blubank.doctorappointment.exception.*;
 import com.blubank.doctorappointment.repository.AppointmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +12,10 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AppointmentService {
@@ -37,36 +39,31 @@ public class AppointmentService {
 
     public Page<AppointmentDTO> getAllAppointments(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-
         return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findAll(pageRequest));
     }
 
     public AppointmentDTO getAppointmentByDateTime(LocalDateTime dateTime) {
-
-        return appointmentConverter.toDto(appointmentRepository.findAppointmentByAppointmentDateTime(dateTime)
+        return appointmentConverter.toDto(appointmentRepository
+                .findAppointmentByAppointmentDateTime(dateTime)
                 .orElseThrow(() -> new NotFoundException("Appointment in selected time (" + dateTime + ") not found!")));
     }
 
     public Page<AppointmentDTO> getAppointmentsByPatientPhoneNumber(String patientPhoneNumber, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-
-        return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findAppointmentsByPatientPhoneNumber(patientPhoneNumber, pageRequest));
+        return appointmentConverter.AppointmentDTOPaginated(
+                appointmentRepository.findAppointmentsByPatientPhoneNumber(patientPhoneNumber, pageRequest));
     }
 
     public Page<AppointmentDTO> getOpenAppointments(LocalDate date, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-
         return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findOpenAppointments(date, pageRequest));
     }
 
-    //Patient
     public AppointmentDTO takeOpenAppointment(LocalDateTime dateTime, String phoneNumber) {
-
         AppointmentDTO appointmentDTO = getAppointmentByDateTime(dateTime);
         Appointment appointment = appointmentConverter.toEntity(appointmentDTO);
 
         if (appointment.getPatient() == null) {
-
             PatientDTO patientDTO = patientService.getPatientByPhoneNumber(phoneNumber);
             Patient patient = patientConverter.toEntity(patientDTO);
 
@@ -74,46 +71,50 @@ public class AppointmentService {
             appointment.setUpdatedAt(LocalDateTime.now());
 
             return appointmentConverter.toDto(appointmentRepository.save(appointment));
-
-        }else {
-
+        } else {
             throw new TakenAppointmentException();
         }
     }
 
     public String deleteAppointmentById(Long id) {
+        Optional<Appointment> optionalAppointment = appointmentRepository.findById(id);
 
-        if ((appointmentRepository.findById(id).isPresent()) && (appointmentRepository.findById(id).get().getPatient() != null)) {
-            appointmentRepository.deleteById(id);
-            return "appointment with code " + id + " removed from list";
-
-        } else if (appointmentRepository.findById(id).isEmpty()) {
-            throw new NotFoundException("Appointment with id = " + id + " not found!");
-
+        if (optionalAppointment.isPresent()) {
+            Appointment appointment = optionalAppointment.get();
+            if (appointment.getPatient() != null) {
+                appointmentRepository.deleteById(id);
+                return "Appointment with code " + id + " removed from the list";
+            } else {
+                throw new TakenAppointmentException();
+            }
         } else {
-            throw new TakenAppointmentException();
+            throw new NotFoundException("Appointment with id = " + id + " not found!");
         }
     }
 
     //Doctor
-    public String saveAppointments(Long doctorId, LocalDateTime startTime, LocalDateTime endTime) throws InvalidStartAndEndTimeException {
+    public String saveAppointments(Long doctorId, LocalDateTime startTime, LocalDateTime endTime) {
 
         if (endTime.isBefore(startTime)) {
             throw new InvalidStartAndEndTimeException();
-        } else {
-            DoctorDTO doctorDTO = doctorService.getDoctorById(doctorId);
-            Doctor doctor = doctorConverter.toEntity(doctorDTO);
-
-            while (startTime.isBefore(endTime)) {
-                LocalDateTime nextTime = startTime.plusMinutes(30);
-                if (Duration.between(startTime, nextTime).toMinutes() >= 30) {
-                    appointmentRepository.save(new Appointment(doctor, startTime));
-                }
-                startTime = nextTime;
-            }
-
-            return "new appointment(s) added for date : " + startTime.toLocalDate().toString();
         }
+        DoctorDTO doctorDTO = doctorService.getDoctorById(doctorId);
+        Doctor doctor = doctorConverter.toEntity(doctorDTO);
+
+        List<Appointment> appointments = generateAppointments(doctor, startTime, endTime);
+
+        appointmentRepository.saveAll(appointments);
+
+        return "new appointment(s) added for date : " + startTime.toLocalDate().toString();
+
+    }
+
+    private List<Appointment> generateAppointments(Doctor doctor, LocalDateTime startTime, LocalDateTime endTime) {
+        long intervalMinutes = 30;
+        return Stream.iterate(startTime, time -> time.plusMinutes(intervalMinutes))
+                .limit((Duration.between(startTime, endTime).toMinutes() + intervalMinutes - 1) / intervalMinutes)
+                .map(time -> new Appointment(doctor, time))
+                .collect(Collectors.toList());
     }
 
 

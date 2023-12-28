@@ -32,7 +32,6 @@ public class DoctorService {
     }
 
     public DoctorDTO saveDoctor(Doctor doctor) {
-
         String medicalCode = doctor.getMedicalCode();
         String fullName = doctor.getFullName();
 

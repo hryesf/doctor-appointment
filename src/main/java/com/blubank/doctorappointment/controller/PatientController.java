@@ -1,13 +1,11 @@
 package com.blubank.doctorappointment.controller;
 
 import com.blubank.doctorappointment.entity.Patient;
-import com.blubank.doctorappointment.exception.*;
 import com.blubank.doctorappointment.service.AppointmentDTO;
 import com.blubank.doctorappointment.service.AppointmentService;
 import com.blubank.doctorappointment.service.PatientDTO;
 import com.blubank.doctorappointment.service.PatientService;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,97 +29,55 @@ public class PatientController {
     }
 
     @GetMapping
-    ResponseEntity<Page<PatientDTO>> getAllPatients(@RequestParam(defaultValue = "1") String page,
-                                                    @RequestParam(defaultValue = "10") String size) {
-        int pageNumber = Integer.parseInt(page);
-        int sizeNumber = Integer.parseInt(size);
-        Page<PatientDTO> patients = patientService.getAllPatients(pageNumber, sizeNumber);
-
-        return new ResponseEntity<>(patients, HttpStatus.OK);
+    ResponseEntity<Page<PatientDTO>> getAllPatients(@RequestParam(defaultValue = "1") int page,
+                                                    @RequestParam(defaultValue = "10") int size) {
+        Page<PatientDTO> patients = patientService.getAllPatients(page, size);
+        return ResponseEntity.ok(patients);
     }
 
     @GetMapping(path = "/{patient_id}")
     ResponseEntity<PatientDTO> getPatientById(@PathVariable("patient_id") Long id) {
-        try {
-            return new ResponseEntity<>(patientService.getPatientById(id), HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        }
+        return ResponseEntity.ok(patientService.getPatientById(id));
     }
 
     @GetMapping(path = "/patient-appointments/{phone_number}")
     ResponseEntity<Page<AppointmentDTO>> getPatientAppointments(@PathVariable("phone_number") String phoneNumber,
-                                                                @RequestParam(defaultValue = "1") String page,
-                                                                @RequestParam(defaultValue = "10") String size) {
-        int pageNumber = Integer.parseInt(page);
-        int sizeNumber = Integer.parseInt(size);
-        try {
-            PatientDTO patientDTO = patientService.getPatientByPhoneNumber(phoneNumber);
-            return new ResponseEntity<>(
-                    appointmentService.getAppointmentsByPatientPhoneNumber(patientDTO.getPhoneNumber(), pageNumber, sizeNumber),
-                    HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        }
+                                                                @RequestParam(defaultValue = "1") int page,
+                                                                @RequestParam(defaultValue = "10") int size) {
+        PatientDTO patientDTO = patientService.getPatientByPhoneNumber(phoneNumber);
+        return ResponseEntity.ok(appointmentService.getAppointmentsByPatientPhoneNumber(patientDTO.getPhoneNumber(), page, size));
     }
 
     @PostMapping
     ResponseEntity<PatientDTO> savePatient(@Valid @RequestBody @NotNull Patient newPatient) {
-        try {
-            return new ResponseEntity<>(patientService.savePatient(newPatient), HttpStatus.OK);
-
-        } catch (DuplicatePatientException e) {
-            throw new DuplicatePatientException(e.getMessage());
-
-        } catch (TakenPhoneNumberException e1) {
-            throw new TakenPhoneNumberException();
-        }
+        return ResponseEntity.ok(patientService.savePatient(newPatient));
     }
 
     @DeleteMapping(path = "/{patient_id}")
     ResponseEntity<String> deletePatientById(@PathVariable("patient_id") Long id) {
-        try {
-            return new ResponseEntity<>(patientService.deletePatientById(id), HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        }
+        return ResponseEntity.ok(patientService.deletePatientById(id));
     }
 
-    // related tp Appointment
+    // related to Appointment
     @GetMapping(path = "/patient/{patient_phoneNumber}")
     ResponseEntity<Page<AppointmentDTO>> getAppointmentsByPatientPhoneNumber(
             @PathVariable("patient_phoneNumber") String phoneNumber,
-            @RequestParam(defaultValue = "1") String page,
-            @RequestParam(defaultValue = "10") String size) {
-        int pageNumber = Integer.parseInt(page);
-        int sizeNumber = Integer.parseInt(size);
-        return new ResponseEntity<>(appointmentService.getAppointmentsByPatientPhoneNumber(phoneNumber, pageNumber, sizeNumber),
-                HttpStatus.OK);
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsByPatientPhoneNumber(phoneNumber, page, size));
     }
 
     @GetMapping(path = "/open-appointments/{date}")
     ResponseEntity<Page<AppointmentDTO>> getOpenAppointments(@PathVariable("date") LocalDate date,
-                                                             @RequestParam(defaultValue = "1") String page,
-                                                             @RequestParam(defaultValue = "10") String size) {
-        int pageNumber = Integer.parseInt(page);
-        int sizeNumber = Integer.parseInt(size);
-        return new ResponseEntity<>(appointmentService.getOpenAppointments(date, pageNumber, sizeNumber),
-                HttpStatus.OK);
+                                                             @RequestParam(defaultValue = "1") int page,
+                                                             @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(appointmentService.getOpenAppointments(date, page, size));
     }
 
     @GetMapping(path = "/select-appointment")
     ResponseEntity<AppointmentDTO> takeOpenAppointment(@Valid @RequestParam @Future LocalDateTime dateTime,
                                                        @Valid @RequestParam @NotNull @NotBlank String patientPhoneNumber) {
-        try {
-            return new ResponseEntity<>(appointmentService.takeOpenAppointment(dateTime, patientPhoneNumber),
-                    HttpStatus.OK);
-
-        } catch (TakenAppointmentException e) {
-            throw new TakenAppointmentException();
-        }
+        return ResponseEntity.ok(appointmentService.takeOpenAppointment(dateTime, patientPhoneNumber));
     }
 
 }
