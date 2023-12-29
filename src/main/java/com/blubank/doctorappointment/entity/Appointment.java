@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Future;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -32,9 +34,18 @@ public class Appointment extends BaseEntity {
     @Column(name = "appointment_dateTime")
     private LocalDateTime appointmentDateTime;
 
+    @NotNull
+    @NotBlank
+    @Column(name = "appointment_state")
+    private AppointmentState appointmentState;
+
+    @Version
+    private Long version;
+
     public Appointment(Doctor doctor, LocalDateTime appointmentDateTime) {
         this.doctor = doctor;
         this.appointmentDateTime = appointmentDateTime;
         this.setCreatedAt(LocalDateTime.now());
+        this.setAppointmentState(AppointmentState.AVAILABLE);
     }
 }
