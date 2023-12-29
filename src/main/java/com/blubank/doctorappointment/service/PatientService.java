@@ -41,13 +41,14 @@ public class PatientService {
         String phoneNumber = patient.getPhoneNumber();
         String fullName = patient.getFullName();
 
-        patientRepository.findPatientByPhoneNumber(phoneNumber).ifPresent(existingPatient -> {
-            if (existingPatient.getFullName().equals(fullName)) {
-                throw new DuplicatePatientException("Patient with name \"" + fullName + "\" and phone number \"" + phoneNumber + "\" is already registered!");
-            } else {
-                throw new TakenPhoneNumberException();
-            }
-        });
+        patientRepository.findPatientByPhoneNumber(phoneNumber)
+                .ifPresent(existingPatient -> {
+                    if (existingPatient.getFullName().equals(fullName)) {
+                        throw new DuplicatePatientException("Patient with name \"" + fullName + "\" and phone number \"" + phoneNumber + "\" is already registered!");
+                    } else {
+                        throw new TakenPhoneNumberException();
+                    }
+                });
 
         patient.setCreatedAt(LocalDateTime.now());
         return patientConverter.toDto(patientRepository.save(patient));
