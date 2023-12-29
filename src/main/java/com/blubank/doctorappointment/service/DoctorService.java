@@ -50,10 +50,9 @@ public class DoctorService {
     }
 
     public String deleteDoctorById(Long id) {
+        doctorRepository.findById(id).
+                orElseThrow(() -> new NotFoundException("Doctor with id = " + id + " not found!"));
 
-        if (!doctorRepository.existsById(id)) {
-            throw new NotFoundException("Doctor with id = " + id + " not found!");
-        }
         doctorRepository.deleteById(id);
         return "Doctor with code = " + id + " removed";
 
