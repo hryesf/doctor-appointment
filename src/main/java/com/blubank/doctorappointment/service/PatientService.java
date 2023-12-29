@@ -5,6 +5,8 @@ import com.blubank.doctorappointment.exception.DuplicatePatientException;
 import com.blubank.doctorappointment.exception.NotFoundException;
 import com.blubank.doctorappointment.exception.TakenPhoneNumberException;
 import com.blubank.doctorappointment.repository.PatientRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 
 @Service
 public class PatientService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
 
     private final PatientRepository patientRepository;
     private final PatientConverter patientConverter;
@@ -44,8 +48,10 @@ public class PatientService {
         patientRepository.findPatientByPhoneNumber(phoneNumber)
                 .ifPresent(existingPatient -> {
                     if (existingPatient.getFullName().equals(fullName)) {
+                        logger.error("DuplicatePatientException: Patient with name \"{}\" and phone number \"{}\" is already registered!", fullName, phoneNumber);
                         throw new DuplicatePatientException("Patient with name \"" + fullName + "\" and phone number \"" + phoneNumber + "\" is already registered!");
                     } else {
+                        logger.error("TakenPhoneNumberException: Phone number \"{}\" is already associated with another patient!", phoneNumber);
                         throw new TakenPhoneNumberException();
                     }
                 });

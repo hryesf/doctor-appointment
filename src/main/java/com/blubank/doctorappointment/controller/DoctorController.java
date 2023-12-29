@@ -5,8 +5,11 @@ import com.blubank.doctorappointment.service.AppointmentDTO;
 import com.blubank.doctorappointment.service.AppointmentService;
 import com.blubank.doctorappointment.service.DoctorDTO;
 import com.blubank.doctorappointment.service.DoctorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -17,8 +20,10 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping(path = "api/v1/doctors")
+@Validated
 public class DoctorController {
 
+    private static final Logger logger = LoggerFactory.getLogger(DoctorController.class);
     private final DoctorService doctorService;
     private final AppointmentService appointmentService;
 
@@ -30,39 +35,60 @@ public class DoctorController {
     @GetMapping
     ResponseEntity<Page<DoctorDTO>> getAllDoctors(@RequestParam(defaultValue = "1") int page,
                                                   @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(doctorService.getAllDoctors(page, size));
+        logger.info("Received request to retrieve all doctors. Page: {}, Size: {}", page, size);
+        Page<DoctorDTO> doctors = doctorService.getAllDoctors(page, size);
+        logger.info("Retrieved {} doctors successfully.", doctors.getTotalElements());
+        return ResponseEntity.ok(doctors);
     }
 
     @GetMapping(path = "/{doctor_id}")
     ResponseEntity<DoctorDTO> getDoctorById(@PathVariable("doctor_id") Long id) {
-        return ResponseEntity.ok(doctorService.getDoctorById(id));
+        logger.info("Received request to retrieve doctor by ID: {}", id);
+        DoctorDTO doctorDTO = doctorService.getDoctorById(id);
+        logger.info("Retrieved doctor successfully. ID: {}", id);
+        return ResponseEntity.ok(doctorDTO);
     }
 
     @PostMapping
     ResponseEntity<DoctorDTO> saveDoctor(@Valid @RequestBody @NotNull Doctor newDoctor) {
-        return ResponseEntity.ok(doctorService.saveDoctor(newDoctor));
+        logger.info("Received request to save a new doctor.");
+        DoctorDTO savedDoctor = doctorService.saveDoctor(newDoctor);
+        logger.info("Saved new doctor successfully.");
+        return ResponseEntity.ok(savedDoctor);
     }
 
     @DeleteMapping(path = "/{doctor_id}")
     ResponseEntity<String> deleteDoctorById(@PathVariable("doctor_id") Long id) {
-        return ResponseEntity.ok(doctorService.deleteDoctorById(id));
+        logger.info("Received request to delete doctor by ID: {}", id);
+        String resultMessage = doctorService.deleteDoctorById(id);
+        logger.info("Deleted doctor successfully. ID: {}", id);
+        return ResponseEntity.ok(resultMessage);
     }
 
     @PostMapping("/add-appointments")
     ResponseEntity<String> saveAppointments(@Valid @RequestParam @NotNull @NotBlank Long doctorId,
                                             @Valid @RequestParam @NotNull @NotBlank @Future LocalDateTime startTime,
                                             @Valid @RequestParam @NotNull @NotBlank @Future LocalDateTime endTime) {
-        return ResponseEntity.ok(appointmentService.saveAppointments(doctorId, startTime, endTime));
+        logger.info("Received request to save appointments for doctor with ID: {}, Start Time: {}, End Time: {}",
+                doctorId, startTime, endTime);
+        String resultMessage = appointmentService.saveAppointments(doctorId, startTime, endTime);
+        logger.info("Saved appointments successfully. Result: {}", resultMessage);
+        return ResponseEntity.ok(resultMessage);
     }
 
     @DeleteMapping(path = "/{appointment_id}")
     ResponseEntity<String> deleteAppointmentById(@PathVariable("appointment_id") Long id) {
-        return ResponseEntity.ok(appointmentService.deleteAppointmentById(id));
+        logger.info("Received request to delete appointment by ID: {}", id);
+        String resultMessage = appointmentService.deleteAppointmentById(id);
+        logger.info("Deleted appointment successfully. ID: {}", id);
+        return ResponseEntity.ok(resultMessage);
     }
 
     @GetMapping
     ResponseEntity<Page<AppointmentDTO>> getAllAppointments(@RequestParam(defaultValue = "1") int page,
                                                             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(appointmentService.getAllAppointments(page, size));
-    }
+        logger.info("Received request to retrieve all appointments. Page: {}, Size: {}", page, size);
+        Page<AppointmentDTO> appointments = appointmentService.getAllAppointments(page, size);
+        logger.info("Retrieved {} appointments successfully.", appointments.getTotalElements());
+        return ResponseEntity.ok(appointments);    }
 }

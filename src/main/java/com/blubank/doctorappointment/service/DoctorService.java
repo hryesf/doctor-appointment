@@ -5,6 +5,8 @@ import com.blubank.doctorappointment.exception.DuplicateDoctorException;
 import com.blubank.doctorappointment.exception.NotFoundException;
 import com.blubank.doctorappointment.exception.TakenMedicalCodeException;
 import com.blubank.doctorappointment.repository.DoctorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ import java.time.LocalDateTime;
 
 @Service
 public class DoctorService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DoctorService.class);
+
     private final DoctorRepository doctorRepository;
     private final DoctorConverter doctorConverter;
 
@@ -38,8 +43,11 @@ public class DoctorService {
         doctorRepository.findByMedicalCode(medicalCode)
                 .ifPresent(existingDoctor -> {
                     if (existingDoctor.getFullName().equals(fullName)) {
+                        logger.error("DuplicateDoctorException: Doctor with name \"{}\" and medical code \"{}\" already exists!", fullName, medicalCode);
                         throw new DuplicateDoctorException("Doctor with name \"" + fullName + "\" and medical code \"" + medicalCode + "\" already exists!");
+
                     } else {
+                        logger.error("TakenMedicalCodeException: Medical code \"{}\" is already associated with another doctor!", medicalCode);
                         throw new TakenMedicalCodeException();
                     }
                 });

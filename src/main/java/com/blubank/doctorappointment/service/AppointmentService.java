@@ -22,6 +22,7 @@ import java.util.List;
 
 @Service
 public class AppointmentService {
+    private final Logger logger = LoggerFactory.getLogger(AppointmentService.class);
 
     private final AppointmentRepository appointmentRepository;
     private final DoctorService doctorService;
@@ -30,7 +31,6 @@ public class AppointmentService {
     private final PatientConverter patientConverter;
     private final AppointmentConverter appointmentConverter;
 
-    private final Logger logger = LoggerFactory.getLogger(AppointmentService.class);
 
     public AppointmentService(AppointmentRepository appointmentRepository, DoctorService doctorService, PatientService patientService, PatientConverter patientConverter, DoctorConverter doctorConverter, AppointmentConverter appointmentConverter) {
         this.appointmentRepository = appointmentRepository;
@@ -67,6 +67,7 @@ public class AppointmentService {
         Appointment appointment = appointmentConverter.toEntity(appointmentDTO);
 
         if (appointment.getAppointmentState() == AppointmentState.TAKEN) {
+            logger.error("Selected appointment is already taken by another patient.");
             throw new TakenAppointmentException();
         }
         PatientDTO patientDTO = patientService.getPatientByPhoneNumber(phoneNumber);
@@ -78,6 +79,7 @@ public class AppointmentService {
 
         try {
             appointmentRepository.save(appointment);
+            logger.info("Taking appointment was successfully processed.");
             return appointmentConverter.toDto(appointment);
 
         } catch (OptimisticLockingFailureException e) {
@@ -97,6 +99,7 @@ public class AppointmentService {
 
         try {
             appointmentRepository.deleteById(appointmentId);
+            logger.info("Deleting appointment was successfully processed.");
             return "Appointment with code " + appointmentId + " removed from the list";
 
         } catch (OptimisticLockingFailureException e) {
