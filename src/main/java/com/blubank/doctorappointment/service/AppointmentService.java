@@ -3,7 +3,9 @@ package com.blubank.doctorappointment.service;
 import com.blubank.doctorappointment.entity.Appointment;
 import com.blubank.doctorappointment.entity.Doctor;
 import com.blubank.doctorappointment.entity.Patient;
-import com.blubank.doctorappointment.exception.*;
+import com.blubank.doctorappointment.exception.InvalidStartAndEndTimeException;
+import com.blubank.doctorappointment.exception.NotFoundException;
+import com.blubank.doctorappointment.exception.TakenAppointmentException;
 import com.blubank.doctorappointment.repository.AppointmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,10 +14,9 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class AppointmentService {
@@ -110,12 +111,18 @@ public class AppointmentService {
     }
 
     private List<Appointment> generateAppointments(Doctor doctor, LocalDateTime startTime, LocalDateTime endTime) {
-        long intervalMinutes = 30;
-        return Stream.iterate(startTime, time -> time.plusMinutes(intervalMinutes))
-                .limit((Duration.between(startTime, endTime).toMinutes() + intervalMinutes - 1) / intervalMinutes)
-                .map(time -> new Appointment(doctor, time))
-                .collect(Collectors.toList());
+        List<Appointment> appointments = new ArrayList<>();
+
+        while (startTime.isBefore(endTime)) {
+            LocalDateTime nextTime = startTime.plusMinutes(30);
+
+            if ((Duration.between(startTime, nextTime).toMinutes() == 30) && (nextTime.isBefore(endTime))) {
+                appointments.add(new Appointment(doctor, startTime));
+            }
+            startTime = nextTime;
+        }
+        return appointments;
     }
-
-
 }
+
+
