@@ -10,10 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RestController
@@ -68,16 +66,16 @@ public class PatientController {
     }
 
     @GetMapping(path = "/open-appointments/{date}")
-    ResponseEntity<Page<AppointmentDTO>> getOpenAppointments(@PathVariable("date") LocalDate date,
+    ResponseEntity<Page<AppointmentDTO>> getOpenAppointments(@PathVariable("date") LocalDateTime date,
                                                              @RequestParam(defaultValue = "1") int page,
                                                              @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(appointmentService.getOpenAppointments(date, page, size));
     }
 
     @GetMapping(path = "/select-appointment")
-    ResponseEntity<AppointmentDTO> takeOpenAppointment(@Valid @RequestParam @Future LocalDateTime dateTime,
+    ResponseEntity<AppointmentDTO> takeOpenAppointment(@Valid @RequestParam @NotNull @NotBlank Long id,
                                                        @Valid @RequestParam @NotNull @NotBlank String patientPhoneNumber) {
-        return ResponseEntity.ok(appointmentService.takeOpenAppointment(dateTime, patientPhoneNumber));
+        return ResponseEntity.ok(appointmentService.takeOpenAppointment(id, patientPhoneNumber));
     }
 
 }
