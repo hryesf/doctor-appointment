@@ -3,6 +3,7 @@ package com.blubank.doctorappointment.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
@@ -24,6 +25,7 @@ public class Doctor extends BaseEntity{
             columnDefinition = "varchar(50) default 'unknown'")
     private String fullName;
 
+    @NaturalId
     @NotNull(message = "Medical Code is required!")
     @NotBlank(message = "Medical Code can not be empty!")
     @Digits(integer = 10,
