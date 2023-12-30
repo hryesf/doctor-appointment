@@ -8,6 +8,7 @@ import com.blubank.doctorappointment.service.PatientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -74,7 +75,9 @@ public class PatientController {
     }
 
     @GetMapping(path = "/available-appointments/{date}")
-    ResponseEntity<Page<AppointmentDTO>> getOpenAppointments(@PathVariable("date") LocalDateTime date,
+    ResponseEntity<Page<AppointmentDTO>> getOpenAppointments(@PathVariable("date")
+                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                             LocalDateTime date,
                                                              @RequestParam(defaultValue = "10") int size) {
         logger.info("Received request to retrieve available appointments for date: {}", date);
         Page<AppointmentDTO> openAppointments = appointmentService.getOpenAppointments(date, size);
@@ -82,8 +85,8 @@ public class PatientController {
         return ResponseEntity.ok(openAppointments);
     }
 
-    @GetMapping(path = "/select-appointment")
-    ResponseEntity<AppointmentDTO> takeOpenAppointment(@Valid @RequestParam @NotNull @NotBlank Long id,
+    @PutMapping(path = "/select-appointment")
+    ResponseEntity<AppointmentDTO> takeOpenAppointment(@Valid @RequestParam @NotNull Long id,
                                                        @Valid @RequestParam @NotNull @NotBlank String patientPhoneNumber) {
         logger.info("Received request to take an open appointment. Appointment ID: {}, Patient Phone Number: {}", id, patientPhoneNumber);
         AppointmentDTO takenAppointment = appointmentService.takeOpenAppointment(id, patientPhoneNumber);
