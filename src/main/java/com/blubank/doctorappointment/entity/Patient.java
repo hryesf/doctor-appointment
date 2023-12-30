@@ -1,8 +1,7 @@
 package com.blubank.doctorappointment.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -10,10 +9,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity(name = "Patient")
 @Table(name = "patient")
@@ -35,9 +35,24 @@ public class Patient extends BaseEntity{
             nullable = false)
     private String phoneNumber;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "patient",
-            cascade = CascadeType.ALL,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             orphanRemoval = true)
     private Set<Appointment> appointmentList = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Patient patient = (Patient) o;
+        return Objects.equals(fullName, patient.fullName) && Objects.equals(phoneNumber, patient.phoneNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fullName, phoneNumber);
+    }
+
 
 }
