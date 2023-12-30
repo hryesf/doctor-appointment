@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Service
+@Transactional
 public class DoctorService {
 
     private static final Logger logger = LoggerFactory.getLogger(DoctorService.class);
@@ -37,29 +38,28 @@ public class DoctorService {
                 .orElseThrow(() -> new NotFoundException("Doctor with id = " + id + " not found!")));
     }
 
-    @Transactional
+
     public DoctorDTO saveDoctor(Doctor doctor) {
         String medicalCode = doctor.getMedicalCode();
         String fullName = doctor.getFullName();
 
-        doctorRepository.findByMedicalCode(medicalCode)
-                .ifPresent(existingDoctor -> {
-                    if (existingDoctor.getFullName().equals(fullName)) {
-                        logger.error("DuplicateDoctorException: Doctor with name \"{}\" and medical code \"{}\" already exists!", fullName, medicalCode);
-                        throw new DuplicateDoctorException("Doctor with name \"" + fullName + "\" and medical code \"" + medicalCode + "\" already exists!");
+        if (doctorRepository.existsByMedicalCode(medicalCode)) {
+            if (doctorRepository.existsByFullName(fullName)) {
+                logger.error("DuplicateDoctorException: Doctor with name \"{}\" and medical code \"{}\" already exists!", fullName, medicalCode);
+                throw new DuplicateDoctorException("Doctor with name \"" + fullName + "\" and medical code \"" + medicalCode + "\" already exists!");
 
-                    } else {
-                        logger.error("TakenMedicalCodeException: Medical code \"{}\" is already associated with another doctor!", medicalCode);
-                        throw new TakenMedicalCodeException();
-                    }
-                });
+            } else {
+                logger.error("TakenMedicalCodeException: Medical code \"{}\" is already associated with another doctor!", medicalCode);
+                throw new TakenMedicalCodeException();
+            }
+        }
 
         doctor.setCreatedAt(LocalDateTime.now());
         return doctorConverter.toDto(doctorRepository.save(doctor));
 
     }
 
-    @Transactional
+
     public String deleteDoctorById(Long id) {
         doctorRepository.findById(id).
                 orElseThrow(() -> new NotFoundException("Doctor with id = " + id + " not found!"));
