@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Service
+@Transactional
 public class PatientService {
 
     private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
