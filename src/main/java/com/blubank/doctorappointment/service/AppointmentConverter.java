@@ -12,6 +12,8 @@ public class AppointmentConverter {
         dto.setDoctor(appointment.getDoctor());
         dto.setAppointmentDateTime(appointment.getAppointmentDateTime());
         dto.setPatient(appointment.getPatient());
+        dto.setAppointmentState(appointment.getAppointmentState());
+        dto.setCreatedAt(appointment.getCreatedAt());
         return dto;
     }
 
@@ -24,6 +26,8 @@ public class AppointmentConverter {
         appointment.setDoctor(dto.getDoctor());
         appointment.setAppointmentDateTime(dto.getAppointmentDateTime());
         appointment.setPatient(dto.getPatient());
+        appointment.setAppointmentState(dto.getAppointmentState());
+        appointment.setCreatedAt(dto.getCreatedAt());
         return appointment;
     }
 }
