@@ -66,7 +66,7 @@ public class DoctorController {
     }
 
     @PostMapping("/add-appointments")
-    ResponseEntity<String> saveAppointments(@Valid @RequestParam @NotNull @NotBlank Long doctorId,
+    ResponseEntity<String> saveAppointments(@Valid @RequestBody Doctor doctor,
                                             @Valid @RequestParam @NotNull @NotBlank @Future
                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                             LocalDateTime startTime,
@@ -74,8 +74,8 @@ public class DoctorController {
                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                             LocalDateTime endTime) {
         logger.info("Received request to save appointments for doctor with ID: {}, Start Time: {}, End Time: {}",
-                doctorId, startTime, endTime);
-        String resultMessage = appointmentService.saveAppointments(doctorId, startTime, endTime);
+                doctor.getId(), startTime, endTime);
+        String resultMessage = appointmentService.saveAppointments(doctor, startTime, endTime);
         logger.info("Saved appointments successfully. Result: {}", resultMessage);
         return ResponseEntity.ok(resultMessage);
     }
