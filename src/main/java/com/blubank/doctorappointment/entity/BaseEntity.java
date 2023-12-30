@@ -21,8 +21,6 @@ public class BaseEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Getters and Setters
-
 
     public void setId(Long id) {
         this.id = id;
