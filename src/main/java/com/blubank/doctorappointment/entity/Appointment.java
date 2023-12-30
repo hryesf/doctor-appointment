@@ -16,27 +16,25 @@ import java.time.LocalDateTime;
 @Entity(name = "Appointment")
 @Table(name = "appointment")
 public class Appointment extends BaseEntity {
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("doctorId")
-    @JoinColumn(name = "doctor_id",
-            foreignKey = @ForeignKey( name = "appointment_doctor_id_fk"),
-            nullable = false)
+    @MapsId("id")
+    @JoinColumn(foreignKey = @ForeignKey( name = "appointment_doctor_id_fk"))
     private Doctor doctor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("patientId")
-    @JoinColumn(name = "patient_id",
-            foreignKey = @ForeignKey( name = "appointment_patient_id_fk"))
+    @MapsId("id")
+    @JoinColumn(foreignKey = @ForeignKey( name = "appointment_patient_id_fk"))
     private Patient patient;
 
     @Future
-    @Column(name = "appointment_dateTime")
+    @NotNull
+    @NotBlank
+    @Column(name = "appointment_dateTime", nullable = false)
     private LocalDateTime appointmentDateTime;
 
     @NotNull
     @NotBlank
-    @Column(name = "appointment_state")
+    @Column(name = "appointment_state", nullable = false)
     private AppointmentState appointmentState;
 
     @Version

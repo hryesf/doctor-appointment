@@ -21,7 +21,7 @@ public class Patient extends BaseEntity{
 
     @NotNull(message = "Full name is required!")
     @NotBlank(message = "Full name can not be empty!")
-    @Column(name = "patient_fullName",
+    @Column(name = "fullName",
             columnDefinition = "varchar(50) default 'unknown'")
     private String fullName;
 

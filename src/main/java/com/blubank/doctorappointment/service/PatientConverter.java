@@ -10,6 +10,7 @@ public class PatientConverter {
         PatientDTO dto = new PatientDTO();
         dto.setFullName(patient.getFullName());
         dto.setPhoneNumber(patient.getPhoneNumber());
+        dto.setCreatedAt(patient.getCreatedAt());
         return dto;
     }
 
@@ -20,8 +21,9 @@ public class PatientConverter {
 
     public Patient toEntity(PatientDTO dto) {
         Patient patient = new Patient();
-        patient.setFullName(dto.getPhoneNumber());
+        patient.setFullName(dto.getFullName());
         patient.setPhoneNumber(dto.getPhoneNumber());
+        patient.setCreatedAt(dto.getCreatedAt());
         return patient;
     }
 }

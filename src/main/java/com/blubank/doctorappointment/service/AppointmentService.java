@@ -12,9 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,9 +42,9 @@ public class AppointmentService {
         this.appointmentConverter = appointmentConverter;
     }
 
-    public Page<AppointmentDTO> getAllAppointments(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findAll(pageRequest));
+    public Page<AppointmentDTO> getAllAppointments(int size) {
+        Pageable pageable = Pageable.ofSize(size);
+        return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findAll(pageable));
     }
 
     public AppointmentDTO getAppointmentById(Long id) {
@@ -51,17 +52,18 @@ public class AppointmentService {
                 .orElseThrow(() -> new NotFoundException("Appointment with id = " + id + " not found!")));
     }
 
-    public Page<AppointmentDTO> getAppointmentsByPatientPhoneNumber(String patientPhoneNumber, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+    public Page<AppointmentDTO> getAppointmentsByPatientPhoneNumber(String patientPhoneNumber, int size) {
+        Pageable pageable = Pageable.ofSize(size);
         return appointmentConverter.AppointmentDTOPaginated(
-                appointmentRepository.findAppointmentsByPatientPhoneNumber(patientPhoneNumber, pageRequest));
+                appointmentRepository.findAppointmentsByPatientPhoneNumber(patientPhoneNumber, pageable));
     }
 
-    public Page<AppointmentDTO> getOpenAppointments(LocalDateTime date, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findOpenAppointments(date, pageRequest));
+    public Page<AppointmentDTO> getOpenAppointments(LocalDateTime date, int size) {
+        Pageable pageable = Pageable.ofSize(size);
+        return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findOpenAppointments(date, pageable));
     }
 
+    @Transactional
     public AppointmentDTO takeOpenAppointment(Long appointmentId, String phoneNumber) {
         AppointmentDTO appointmentDTO = getAppointmentById(appointmentId);
         Appointment appointment = appointmentConverter.toEntity(appointmentDTO);
@@ -89,6 +91,7 @@ public class AppointmentService {
 
     }
 
+    @Transactional
     public String deleteAppointmentById(Long appointmentId) {
         AppointmentDTO appointmentDTO = getAppointmentById(appointmentId);
         Appointment appointment = appointmentConverter.toEntity(appointmentDTO);
@@ -108,7 +111,7 @@ public class AppointmentService {
         }
     }
 
-
+    @Transactional
     public String saveAppointments(Long doctorId, LocalDateTime startTime, LocalDateTime endTime) {
 
         if (endTime.isBefore(startTime)) {
@@ -121,7 +124,7 @@ public class AppointmentService {
 
         appointmentRepository.saveAll(appointments);
 
-        return "new appointment(s) added for date : " + startTime.toLocalDate().toString();
+        return appointments.size() + "new appointment(s) added for date : " + startTime.toLocalDate().toString();
 
     }
 

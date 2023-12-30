@@ -8,9 +8,10 @@ import com.blubank.doctorappointment.repository.PatientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Service
@@ -26,9 +27,9 @@ public class PatientService {
         this.patientConverter = patientConverter;
     }
 
-    public Page<PatientDTO> getAllPatients(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        return patientConverter.PatientDTOPaginated(patientRepository.findAll(pageRequest));
+    public Page<PatientDTO> getAllPatients(int size) {
+        Pageable pageable = Pageable.ofSize(size);
+        return patientConverter.PatientDTOPaginated(patientRepository.findAll(pageable));
     }
 
     public PatientDTO getPatientById(Long id) {
@@ -41,6 +42,7 @@ public class PatientService {
                 .orElseThrow(() -> new NotFoundException("Patient with phone number \"" + phoneNumber + "\" not Found")));
     }
 
+    @Transactional
     public PatientDTO savePatient(Patient patient) {
         String phoneNumber = patient.getPhoneNumber();
         String fullName = patient.getFullName();
@@ -60,6 +62,7 @@ public class PatientService {
         return patientConverter.toDto(patientRepository.save(patient));
     }
 
+    @Transactional
     public String deletePatientById(Long id) {
         if (patientRepository.existsById(id)) {
             patientRepository.deleteById(id);

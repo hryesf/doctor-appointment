@@ -10,6 +10,7 @@ public class DoctorConverter {
         DoctorDTO dto = new DoctorDTO();
         dto.setFullName(doctor.getFullName());
         dto.setMedicalCode(doctor.getMedicalCode());
+        dto.setCreatedAt(doctor.getCreatedAt());
         return dto;
     }
 
@@ -19,8 +20,9 @@ public class DoctorConverter {
 
     public Doctor toEntity(DoctorDTO dto) {
         Doctor doctor = new Doctor();
-        doctor.setFullName(dto.getMedicalCode());
+        doctor.setFullName(dto.getFullName());
         doctor.setMedicalCode(dto.getMedicalCode());
+        doctor.setCreatedAt(dto.getCreatedAt());
         return doctor;
     }
 }

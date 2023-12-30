@@ -2,7 +2,7 @@ package com.blubank.doctorappointment.repository;
 
 import com.blubank.doctorappointment.entity.Appointment;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -22,10 +22,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "0")})
     Optional<Appointment> findById(Long id);
 
-    @Query("SELECT a FROM Appointment a WHERE a.appointmentState = 'AVAILABLE' AND a.appointmentDateTime > :currentDateTime")
-    Page<Appointment> findOpenAppointments(@Param("date") LocalDateTime dateTime, PageRequest pageRequest);
+    @Query("SELECT a FROM Appointment a WHERE a.appointmentState = 'AVAILABLE' AND a.appointmentDateTime > :dateTime")
+    Page<Appointment> findOpenAppointments(@Param("dateTime") LocalDateTime dateTime, Pageable pageable);
 
-    Page<Appointment> findAppointmentsByPatientPhoneNumber(String patientPhoneNumber, PageRequest pageRequest);
+    Page<Appointment> findAppointmentsByPatientPhoneNumber(String patientPhoneNumber, Pageable pageable);
 
 
 }

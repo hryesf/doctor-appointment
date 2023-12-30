@@ -41,4 +41,9 @@ public class Doctor extends BaseEntity{
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     private Set<Appointment> appointmentList = new HashSet<>();
+
+/*    public Doctor(String fullName, String medicalCode) {
+        this.fullName = fullName;
+        this.medicalCode = medicalCode;
+    }*/
 }

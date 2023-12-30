@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AppointmentConverter {
+
     public AppointmentDTO toDto(Appointment appointment) {
         AppointmentDTO dto = new AppointmentDTO();
         dto.setDoctor(appointment.getDoctor());

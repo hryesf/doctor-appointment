@@ -8,6 +8,7 @@ import com.blubank.doctorappointment.service.DoctorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,10 +34,9 @@ public class DoctorController {
     }
 
     @GetMapping
-    ResponseEntity<Page<DoctorDTO>> getAllDoctors(@RequestParam(defaultValue = "1") int page,
-                                                  @RequestParam(defaultValue = "10") int size) {
-        logger.info("Received request to retrieve all doctors. Page: {}, Size: {}", page, size);
-        Page<DoctorDTO> doctors = doctorService.getAllDoctors(page, size);
+    ResponseEntity<Page<DoctorDTO>> getAllDoctors(@RequestParam(defaultValue = "10") int size) {
+        logger.info("Received request to retrieve all doctors. Size: {}", size);
+        Page<DoctorDTO> doctors = doctorService.getAllDoctors(size);
         logger.info("Retrieved {} doctors successfully.", doctors.getTotalElements());
         return ResponseEntity.ok(doctors);
     }
@@ -67,8 +67,12 @@ public class DoctorController {
 
     @PostMapping("/add-appointments")
     ResponseEntity<String> saveAppointments(@Valid @RequestParam @NotNull @NotBlank Long doctorId,
-                                            @Valid @RequestParam @NotNull @NotBlank @Future LocalDateTime startTime,
-                                            @Valid @RequestParam @NotNull @NotBlank @Future LocalDateTime endTime) {
+                                            @Valid @RequestParam @NotNull @NotBlank @Future
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                            LocalDateTime startTime,
+                                            @Valid @RequestParam @NotNull @NotBlank @Future
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                            LocalDateTime endTime) {
         logger.info("Received request to save appointments for doctor with ID: {}, Start Time: {}, End Time: {}",
                 doctorId, startTime, endTime);
         String resultMessage = appointmentService.saveAppointments(doctorId, startTime, endTime);
@@ -76,7 +80,7 @@ public class DoctorController {
         return ResponseEntity.ok(resultMessage);
     }
 
-    @DeleteMapping(path = "/{appointment_id}")
+    @DeleteMapping(path = "/delete-appointment/{appointment_id}")
     ResponseEntity<String> deleteAppointmentById(@PathVariable("appointment_id") Long id) {
         logger.info("Received request to delete appointment by ID: {}", id);
         String resultMessage = appointmentService.deleteAppointmentById(id);
@@ -84,11 +88,10 @@ public class DoctorController {
         return ResponseEntity.ok(resultMessage);
     }
 
-    @GetMapping
-    ResponseEntity<Page<AppointmentDTO>> getAllAppointments(@RequestParam(defaultValue = "1") int page,
-                                                            @RequestParam(defaultValue = "10") int size) {
-        logger.info("Received request to retrieve all appointments. Page: {}, Size: {}", page, size);
-        Page<AppointmentDTO> appointments = appointmentService.getAllAppointments(page, size);
+    @GetMapping("/show-appointments")
+    ResponseEntity<Page<AppointmentDTO>> getAllAppointments(@RequestParam(defaultValue = "10") int size) {
+        logger.info("Received request to retrieve all appointments. Size: {}", size);
+        Page<AppointmentDTO> appointments = appointmentService.getAllAppointments(size);
         logger.info("Retrieved {} appointments successfully.", appointments.getTotalElements());
         return ResponseEntity.ok(appointments);    }
 }
