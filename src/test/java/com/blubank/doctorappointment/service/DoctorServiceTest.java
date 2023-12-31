@@ -5,7 +5,6 @@ import com.blubank.doctorappointment.exception.DuplicateDoctorException;
 import com.blubank.doctorappointment.exception.TakenMedicalCodeException;
 import com.blubank.doctorappointment.repository.DoctorRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -37,6 +36,7 @@ class DoctorServiceTest {
         underTest = new DoctorService(doctorRepository, doctorConverter);
     }
 
+
     @Test
     void itShouldGetAllDoctors() {
         // Given
@@ -46,14 +46,6 @@ class DoctorServiceTest {
         underTest.getAllDoctorsDto(size);
         // Then
         verify(doctorRepository).findAll(pageable);
-    }
-
-    @Test
-    @Disabled
-    void itShouldGetDoctorById() {
-        // Given
-        // When
-        // Then
     }
 
     @Test
@@ -82,7 +74,7 @@ class DoctorServiceTest {
 
         // When
         // Then
-        assertThatThrownBy(() -> doctorConverter.toEntity(underTest.saveDoctor(doctor)))
+        assertThatThrownBy(() -> underTest.saveDoctor(doctor))
                 .isInstanceOf(TakenMedicalCodeException.class)
                 .hasMessageContaining("Medical code is taken!");
 
@@ -100,17 +92,11 @@ class DoctorServiceTest {
                 .willReturn(true);
         // When
         // Then
-        assertThatThrownBy(() -> doctorConverter.toEntity(underTest.saveDoctor(doctor)))
+        assertThatThrownBy(() -> underTest.saveDoctor(doctor))
                 .isInstanceOf(DuplicateDoctorException.class)
                 .hasMessageContaining("Doctor with name \"" + doctor.getFullName() + "\" and medical code \"" + doctor.getMedicalCode() + "\" already exists!");
 
         verify(doctorRepository, never()).save(any());
     }
 
-    @Test
-    void itShouldDeleteDoctorById() {
-        // Given
-        // When
-        // Then
-    }
 }
