@@ -28,19 +28,24 @@ public class PatientService {
         this.patientConverter = patientConverter;
     }
 
-    public Page<PatientDTO> getAllPatients(int size) {
+    public Page<PatientDTO> getAllPatientsDto(int size) {
         Pageable pageable = Pageable.ofSize(size);
         return patientConverter.PatientDTOPaginated(patientRepository.findAll(pageable));
     }
 
-    public PatientDTO getPatientById(Long id) {
+    public PatientDTO getPatientDtoById(Long id) {
         return patientConverter.toDto(patientRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Patient with id = " + id + " not found!")));
     }
 
-    public PatientDTO getPatientByPhoneNumber(String phoneNumber) {
+    public PatientDTO getPatientDtoByPhoneNumber(String phoneNumber) {
         return patientConverter.toDto(patientRepository.findPatientByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new NotFoundException("Patient with phone number \"" + phoneNumber + "\" not Found")));
+    }
+
+    public Patient getPatientByPhoneNumber(String phoneNumber) {
+        return patientRepository.findPatientByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new NotFoundException("Patient with phone number \"" + phoneNumber + "\" not Found"));
     }
 
     @Transactional

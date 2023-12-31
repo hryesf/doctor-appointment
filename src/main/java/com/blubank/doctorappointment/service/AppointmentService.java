@@ -8,7 +8,6 @@ import com.blubank.doctorappointment.exception.InvalidStartAndEndTimeException;
 import com.blubank.doctorappointment.exception.NotFoundException;
 import com.blubank.doctorappointment.exception.TakenAppointmentException;
 import com.blubank.doctorappointment.repository.AppointmentRepository;
-import com.blubank.doctorappointment.repository.DoctorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -28,58 +27,45 @@ public class AppointmentService {
     private final Logger logger = LoggerFactory.getLogger(AppointmentService.class);
 
     private final AppointmentRepository appointmentRepository;
-    private final DoctorRepository doctorRepository;
-
     private final DoctorService doctorService;
     private final PatientService patientService;
-    private final DoctorConverter doctorConverter;
-    private final PatientConverter patientConverter;
     private final AppointmentConverter appointmentConverter;
 
 
     public AppointmentService(AppointmentRepository appointmentRepository,
-                              DoctorRepository doctorRepository,
                               DoctorService doctorService,
                               PatientService patientService,
-                              PatientConverter patientConverter,
-                              DoctorConverter doctorConverter,
                               AppointmentConverter appointmentConverter) {
         this.appointmentRepository = appointmentRepository;
-        this.doctorRepository = doctorRepository;
         this.doctorService = doctorService;
         this.patientService = patientService;
-        this.patientConverter = patientConverter;
-        this.doctorConverter = doctorConverter;
         this.appointmentConverter = appointmentConverter;
     }
 
-    public Page<AppointmentDTO> getAllAppointments(int size) {
+    public Page<AppointmentDTO> getAllAppointmentsDto(int size) {
         Pageable pageable = Pageable.ofSize(size);
         return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findAll(pageable));
     }
 
-    public AppointmentDTO getAppointmentById(Long id) {
-        return appointmentConverter.toDto(appointmentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Appointment with id = " + id + " not found!")));
-    }
-
-    public Page<AppointmentDTO> getAppointmentsByPatientPhoneNumber(String patientPhoneNumber, int size) {
+    public Page<AppointmentDTO> getAppointmentsDtoByPatientPhoneNumber(String patientPhoneNumber, int size) {
         Pageable pageable = Pageable.ofSize(size);
         return appointmentConverter.AppointmentDTOPaginated(
                 appointmentRepository.findAppointmentsByPatientPhoneNumber(patientPhoneNumber, pageable));
     }
 
-    public Page<AppointmentDTO> getOpenAppointments(LocalDateTime date, int size) {
+    public Page<AppointmentDTO> getOpenAppointmentsDto(LocalDateTime date, int size) {
         Pageable pageable = Pageable.ofSize(size);
         return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findOpenAppointments(date, pageable));
     }
 
-    public AppointmentDTO takeOpenAppointment(Long appointmentId, String phoneNumber) {
-        AppointmentDTO appointmentDTO = getAppointmentById(appointmentId);
-        Appointment appointment = appointmentConverter.toEntity(appointmentDTO);
+    public Appointment getAppointmentById(Long id) {
+        return appointmentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Appointment with id = " + id + " not found!"));
+    }
 
-        PatientDTO patientDTO = patientService.getPatientByPhoneNumber(phoneNumber);
-        Patient patient = patientConverter.toEntity(patientDTO);
+    public AppointmentDTO takeOpenAppointment(Long appointmentId, String phoneNumber) {
+        Appointment appointment = getAppointmentById(appointmentId);
+        Patient patient = patientService.getPatientByPhoneNumber(phoneNumber);
 
         if (appointment.getAppointmentState() == AppointmentState.TAKEN) {
             logger.error("Selected appointment is already taken by another patient.");
@@ -104,8 +90,7 @@ public class AppointmentService {
 
 
     public String deleteAppointmentById(Long appointmentId) {
-        AppointmentDTO appointmentDTO = getAppointmentById(appointmentId);
-        Appointment appointment = appointmentConverter.toEntity(appointmentDTO);
+        Appointment appointment = getAppointmentById(appointmentId);
 
         if (appointment.getAppointmentState() == AppointmentState.TAKEN || appointment.getPatient() != null) {
             throw new TakenAppointmentException();
@@ -127,8 +112,6 @@ public class AppointmentService {
         if (endTime.isBefore(startTime)) {
             throw new InvalidStartAndEndTimeException();
         }
-        /*DoctorDTO doctorDTO = doctorService.getDoctorById(doctorId);
-        Doctor doctor = doctorConverter.toEntity(doctorDTO);*/
 
         Set<Appointment> appointments = generateAppointments(doctor, startTime, endTime);
 

@@ -28,16 +28,15 @@ public class DoctorService {
         this.doctorConverter = doctorConverter;
     }
 
-    public Page<DoctorDTO> getAllDoctors(int size) {
+    public Page<DoctorDTO> getAllDoctorsDto(int size) {
         Pageable pageable = Pageable.ofSize(size);
         return doctorConverter.doctorDTOPaginated(doctorRepository.findAll(pageable));
     }
 
-    public DoctorDTO getDoctorById(Long id) {
+    public DoctorDTO getDoctorDtoById(Long id) {
         return doctorConverter.toDto(doctorRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Doctor with id = " + id + " not found!")));
     }
-
 
     public DoctorDTO saveDoctor(Doctor doctor) {
         String medicalCode = doctor.getMedicalCode();
