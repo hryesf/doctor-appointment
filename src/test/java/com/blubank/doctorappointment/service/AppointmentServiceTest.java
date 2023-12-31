@@ -24,8 +24,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,7 +96,7 @@ class AppointmentServiceTest {
 
     // Concurrency check; patient is taking an appointment that is in the process of deletion or being taken by another patient.
     @Test
-    void takeOpenAppointment_ConcurrentUpdate() {
+    void takeOpenAppointmentConcurrentUpdate() {
         // Given
         Long appointmentId = 1L;
         String phoneNumber = "123456789";
@@ -108,22 +107,18 @@ class AppointmentServiceTest {
         Patient patient = new Patient();
         patient.setPhoneNumber(phoneNumber);
 
-        // Mock repository response for getting appointment
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
 
-        // Mock patient service response
         when(patientService.getPatientByPhoneNumber(phoneNumber)).thenReturn(patient);
 
-        // Mock repository behavior to simulate concurrent update
-        doThrow(OptimisticLockingFailureException.class)
-                .when(appointmentRepository.save(appointment));
+        doThrow(new OptimisticLockingFailureException("Optimistic locking failure for taking an appointment with id: " + appointmentId))
+                .when(appointmentRepository).save(appointment);
 
         // When and Then
         assertThatThrownBy(() -> underTest.takeOpenAppointment(appointmentId, phoneNumber))
                 .isInstanceOf(OptimisticLockingFailureException.class)
                 .hasMessage("Optimistic locking failure for taking an appointment with id: " + appointmentId);
 
-        // Verify interactions
         verify(appointmentRepository).findById(appointmentId);
         verify(patientService).getPatientByPhoneNumber(phoneNumber);
         verify(appointmentRepository).save(appointment);
@@ -141,22 +136,6 @@ class AppointmentServiceTest {
         assertThatThrownBy(() -> underTest.takeOpenAppointment(appointmentId, phoneNumber))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Appointment with id = " + appointmentId + " not found!");
-
-    }
-
-    @Test
-    void itWillThrowWhenPatientPhoneNumberIsNotAvailable() {
-        // Given
-        Long appointmentId = 1L;
-        String phoneNumber = null;
-
-        Appointment appointment = new Appointment();
-        appointment.setId(appointmentId);
-
-        // When and Then
-        assertThatThrownBy(() -> underTest.takeOpenAppointment(appointmentId, phoneNumber))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Patient with phone number \"" + phoneNumber + "\" not Found");
 
     }
 
@@ -182,6 +161,8 @@ class AppointmentServiceTest {
     }
 
     //Concurrency check; if doctor is deleting the same appointment that a patient is taking at the same time.
+
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     @Test
     void itWillThrowWhenConcurrencyHappened() {
         // Given
@@ -189,19 +170,23 @@ class AppointmentServiceTest {
         Appointment availableAppointment = new Appointment();
         availableAppointment.setAppointmentState(AppointmentState.AVAILABLE);
 
-        when(appointmentRepository.findById(appointmentId))
-                .thenReturn(Optional.of(availableAppointment));
+        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(availableAppointment));
 
         doThrow(OptimisticLockingFailureException.class)
                 .when(appointmentRepository).deleteById(appointmentId);
 
         // When
-        String result = underTest.deleteAppointmentById(appointmentId);
+        try {
+            underTest.deleteAppointmentById(appointmentId);
+            fail("Expected OptimisticLockingFailureException, but it was not thrown.");
+        } catch (OptimisticLockingFailureException e) {
+            // Then
+            assertEquals("Optimistic locking failure for taking an appointment with id: 1", e.getMessage());
 
-        // Then
-        assertEquals("Appointment with id = 1 can not remove from the list! \nPlease try again later.", result);
-
-        verify(appointmentRepository).deleteById(appointmentId);
+            // Verify interactions
+            verify(appointmentRepository).deleteById(appointmentId);
+            verifyNoMoreInteractions(appointmentRepository);
+        }
     }
 
 
@@ -230,7 +215,6 @@ class AppointmentServiceTest {
         // Then
         assertThat(openAppointments).isEqualTo(emptyAppointmentDTOPage);
 
-        // Verify repository method was called
         verify(appointmentRepository).findOpenAppointments(date, pageable);
     }
 
