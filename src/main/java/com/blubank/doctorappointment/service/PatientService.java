@@ -55,16 +55,15 @@ public class PatientService {
         String phoneNumber = patient.getPhoneNumber();
         String fullName = patient.getFullName();
 
-        patientRepository.findPatientByPhoneNumber(phoneNumber)
-                .ifPresent(existingPatient -> {
-                    if (existingPatient.getFullName().equals(fullName)) {
-                        logger.error("DuplicatePatientException: Patient with name \"{}\" and phone number \"{}\" is already registered!", fullName, phoneNumber);
-                        throw new DuplicatePatientException("Patient with name \"" + fullName + "\" and phone number \"" + phoneNumber + "\" is already registered!");
-                    } else {
-                        logger.error("TakenPhoneNumberException: Phone number \"{}\" is already associated with another patient!", phoneNumber);
-                        throw new TakenPhoneNumberException();
-                    }
-                });
+        if (patientRepository.existsByPhoneNumber(phoneNumber)) {
+            if (patientRepository.existsByFullName(fullName)) {
+                logger.error("DuplicatePatientException: Patient with name \"{}\" and phone number \"{}\" is already registered!", fullName, phoneNumber);
+                throw new DuplicatePatientException("Patient with name \"" + fullName + "\" and phone number \"" + phoneNumber + "\" is already registered!");
+            } else {
+                logger.error("TakenPhoneNumberException: Phone number \"{}\" is already associated with another patient!", phoneNumber);
+                throw new TakenPhoneNumberException();
+            }
+        }
 
         patient.setCreatedAt(LocalDateTime.now());
         return patientConverter.toDto(patientRepository.save(patient));
