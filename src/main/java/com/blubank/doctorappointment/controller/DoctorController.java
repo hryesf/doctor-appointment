@@ -65,6 +65,15 @@ public class DoctorController {
         return ResponseEntity.ok(resultMessage);
     }
 
+    @GetMapping(path = "/doctor-appointments")
+    ResponseEntity<Page<AppointmentDTO>> getAppointmentsDtoDoctorById(@RequestParam Long id,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        logger.info("Received request to retrieve Appointments of doctor by ID: {}", id);
+        Page<AppointmentDTO> appointmentDTOS = appointmentService.getAppointmentsDtoByDoctorId(id, size);
+        logger.info("Retrieved appointments successfully.");
+        return ResponseEntity.ok(appointmentDTOS);
+    }
+
     @PostMapping("/add-appointments")
     ResponseEntity<String> saveAppointments(@Valid @RequestBody Doctor doctor,
                                             @Valid @RequestParam @NotNull @NotBlank @Future
