@@ -22,7 +22,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "0")})
     Optional<Appointment> findById(Long id);
 
-    @Query("SELECT a FROM Appointment a WHERE a.appointmentState = 'AVAILABLE' AND a.appointmentDateTime > :dateTime")
+    @Query("SELECT a FROM Appointment a WHERE a.appointmentState = 'AVAILABLE' AND a.appointmentDateTime >= :dateTime")
     Page<Appointment> findOpenAppointments(@Param("dateTime") LocalDateTime dateTime, Pageable pageable);
 
     Page<Appointment> findAppointmentsByPatientPhoneNumber(String patientPhoneNumber, Pageable pageable);
