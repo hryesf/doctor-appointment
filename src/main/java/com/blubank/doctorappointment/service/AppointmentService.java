@@ -54,6 +54,17 @@ public class AppointmentService {
                 appointmentRepository.findAppointmentsByPatientPhoneNumber(patientPhoneNumber, pageable));
     }
 
+    public Page<AppointmentDTO> getAppointmentsDtoByDoctorId(Long doctorId, int size) {
+        Pageable pageable = Pageable.ofSize(size);
+        return appointmentConverter.AppointmentDTOPaginated(
+                appointmentRepository.findAppointmentsByDoctor_Id(doctorId, pageable));
+    }
+
+    public Page<Appointment> getAppointmentsByDoctorId(Long doctorId, int size) {
+        Pageable pageable = Pageable.ofSize(size);
+        return appointmentRepository.findAppointmentsByDoctor_Id(doctorId, pageable);
+    }
+
     public Page<AppointmentDTO> getOpenAppointmentsDto(LocalDateTime date, int size) {
         Pageable pageable = Pageable.ofSize(size);
         return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findOpenAppointments(date, pageable));
@@ -123,7 +134,7 @@ public class AppointmentService {
 
     }
 
-    private Set<Appointment> generateAppointments(Doctor doctor, LocalDateTime startTime, LocalDateTime endTime) {
+    public Set<Appointment> generateAppointments(Doctor doctor, LocalDateTime startTime, LocalDateTime endTime) {
         Set<Appointment> appointments = new HashSet<>();
 
         while (startTime.isBefore(endTime)) {
