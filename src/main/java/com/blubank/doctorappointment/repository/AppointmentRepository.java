@@ -27,5 +27,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     Page<Appointment> findAppointmentsByPatientPhoneNumber(String patientPhoneNumber, Pageable pageable);
 
+    Page<Appointment> findAppointmentsByDoctor_Id(Long doctorId, Pageable pageable);
+
 
 }
