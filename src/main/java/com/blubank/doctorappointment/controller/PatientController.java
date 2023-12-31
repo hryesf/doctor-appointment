@@ -85,7 +85,7 @@ public class PatientController {
         return ResponseEntity.ok(openAppointments);
     }
 
-    @PutMapping(path = "/select-appointment")
+    @PutMapping(path = "/take-appointment")
     ResponseEntity<AppointmentDTO> takeOpenAppointment(@Valid @RequestParam @NotNull Long id,
                                                        @Valid @RequestParam @NotNull @NotBlank String patientPhoneNumber) {
         logger.info("Received request to take an open appointment. Appointment ID: {}, Patient Phone Number: {}", id, patientPhoneNumber);
