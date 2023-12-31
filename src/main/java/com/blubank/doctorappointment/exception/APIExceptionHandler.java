@@ -37,7 +37,7 @@ public class APIExceptionHandler {
 
     @ExceptionHandler(value = {TakenAppointmentException.class})
     public ResponseEntity<String> handleTakenAppointmentException(TakenAppointmentException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(value = {TakenPhoneNumberException.class})
