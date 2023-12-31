@@ -54,6 +54,11 @@ public class AppointmentService {
                 appointmentRepository.findAppointmentsByPatientPhoneNumber(patientPhoneNumber, pageable));
     }
 
+    public Page<Appointment> getAppointmentsByPatientPhoneNumber(String patientPhoneNumber, int size) {
+        Pageable pageable = Pageable.ofSize(size);
+        return appointmentRepository.findAppointmentsByPatientPhoneNumber(patientPhoneNumber, pageable);
+    }
+
     public Page<AppointmentDTO> getAppointmentsDtoByDoctorId(Long doctorId, int size) {
         Pageable pageable = Pageable.ofSize(size);
         return appointmentConverter.AppointmentDTOPaginated(
