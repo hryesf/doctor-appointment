@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class DoctorService {
 
     private static final Logger logger = LoggerFactory.getLogger(DoctorService.class);
@@ -39,6 +39,7 @@ public class DoctorService {
     }
 
 
+    @Transactional
     public DoctorDTO saveDoctor(Doctor doctor) {
         String medicalCode = doctor.getMedicalCode();
         String fullName = doctor.getFullName();
@@ -60,6 +61,7 @@ public class DoctorService {
     }
 
 
+    @Transactional
     public String deleteDoctorById(Long id) {
         doctorRepository.findById(id).
                 orElseThrow(() -> new NotFoundException("Doctor with id = " + id + " not found!"));

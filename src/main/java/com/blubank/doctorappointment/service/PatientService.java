@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class PatientService {
 
     private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
@@ -49,6 +49,7 @@ public class PatientService {
                 .orElseThrow(() -> new NotFoundException("Patient with phone number \"" + phoneNumber + "\" not Found"));
     }
 
+
     @Transactional
     public PatientDTO savePatient(Patient patient) {
         String phoneNumber = patient.getPhoneNumber();
@@ -68,6 +69,7 @@ public class PatientService {
         patient.setCreatedAt(LocalDateTime.now());
         return patientConverter.toDto(patientRepository.save(patient));
     }
+
 
     @Transactional
     public String deletePatientById(Long id) {

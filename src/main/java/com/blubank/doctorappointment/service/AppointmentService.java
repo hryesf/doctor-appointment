@@ -14,15 +14,15 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class AppointmentService {
     private final Logger logger = LoggerFactory.getLogger(AppointmentService.class);
 
@@ -79,6 +79,7 @@ public class AppointmentService {
                 .orElseThrow(() -> new NotFoundException("Appointment with id = " + id + " not found!"));
     }
 
+    @Transactional
     public AppointmentDTO takeOpenAppointment(Long appointmentId, String phoneNumber) {
         Appointment appointment = getAppointmentById(appointmentId);
         Patient patient = patientService.getPatientByPhoneNumber(phoneNumber);
@@ -103,6 +104,7 @@ public class AppointmentService {
         }
     }
 
+    @Transactional
     public String deleteAppointmentById(Long appointmentId) {
         Appointment appointment = getAppointmentById(appointmentId);
 
@@ -121,6 +123,7 @@ public class AppointmentService {
         }
     }
 
+    @Transactional
     public String saveAppointments(Doctor doctor, LocalDateTime startTime, LocalDateTime endTime) {
 
         if (endTime.isBefore(startTime)) {
