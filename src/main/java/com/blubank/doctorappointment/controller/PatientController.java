@@ -35,15 +35,15 @@ public class PatientController {
     @GetMapping
     ResponseEntity<Page<PatientDTO>> getAllPatients(@RequestParam(defaultValue = "10") int size) {
         logger.info("Received request to retrieve all patients. Size: {}",size);
-        Page<PatientDTO> patients = patientService.getAllPatients(size);
-        logger.info("Retrieved {} patients successfully.", patients.getTotalElements());
-        return ResponseEntity.ok(patients);
+        Page<PatientDTO> patientsDto = patientService.getAllPatientsDto(size);
+        logger.info("Retrieved {} patients successfully.", patientsDto.getTotalElements());
+        return ResponseEntity.ok(patientsDto);
     }
 
     @GetMapping(path = "/{patient_id}")
     ResponseEntity<PatientDTO> getPatientById(@PathVariable("patient_id") Long id) {
         logger.info("Received request to retrieve patient by ID: {}", id);
-        PatientDTO patientDTO = patientService.getPatientById(id);
+        PatientDTO patientDTO = patientService.getPatientDtoById(id);
         logger.info("Retrieved patient successfully. ID: {}", id);
         return ResponseEntity.ok(patientDTO);
     }
@@ -68,8 +68,8 @@ public class PatientController {
     ResponseEntity<Page<AppointmentDTO>> getPatientAppointments(@PathVariable("phone_number") String phoneNumber,
                                                                 @RequestParam(defaultValue = "10") int size) {
         logger.info("Received request to retrieve appointments for patient with phone number: {}", phoneNumber);
-        PatientDTO patientDTO = patientService.getPatientByPhoneNumber(phoneNumber);
-        Page<AppointmentDTO> appointments = appointmentService.getAppointmentsByPatientPhoneNumber(patientDTO.getPhoneNumber(), size);
+        PatientDTO patientDTO = patientService.getPatientDtoByPhoneNumber(phoneNumber);
+        Page<AppointmentDTO> appointments = appointmentService.getAppointmentsDtoByPatientPhoneNumber(patientDTO.getPhoneNumber(), size);
         logger.info("Retrieved {} appointments for patient with phone number: {}", appointments.getTotalElements(), phoneNumber);
         return ResponseEntity.ok(appointments);
     }
@@ -80,12 +80,12 @@ public class PatientController {
                                                              LocalDateTime date,
                                                              @RequestParam(defaultValue = "10") int size) {
         logger.info("Received request to retrieve available appointments for date: {}", date);
-        Page<AppointmentDTO> openAppointments = appointmentService.getOpenAppointments(date, size);
+        Page<AppointmentDTO> openAppointments = appointmentService.getOpenAppointmentsDto(date, size);
         logger.info("Retrieved {} available appointments for date: {}", openAppointments.getTotalElements(), date);
         return ResponseEntity.ok(openAppointments);
     }
 
-    @PutMapping(path = "/take-appointment")
+    @GetMapping(path = "/take-appointment")
     ResponseEntity<AppointmentDTO> takeOpenAppointment(@Valid @RequestParam @NotNull Long id,
                                                        @Valid @RequestParam @NotNull @NotBlank String patientPhoneNumber) {
         logger.info("Received request to take an open appointment. Appointment ID: {}, Patient Phone Number: {}", id, patientPhoneNumber);

@@ -36,7 +36,7 @@ public class DoctorController {
     @GetMapping
     ResponseEntity<Page<DoctorDTO>> getAllDoctors(@RequestParam(defaultValue = "10") int size) {
         logger.info("Received request to retrieve all doctors. Size: {}", size);
-        Page<DoctorDTO> doctors = doctorService.getAllDoctors(size);
+        Page<DoctorDTO> doctors = doctorService.getAllDoctorsDto(size);
         logger.info("Retrieved {} doctors successfully.", doctors.getTotalElements());
         return ResponseEntity.ok(doctors);
     }
@@ -44,7 +44,7 @@ public class DoctorController {
     @GetMapping(path = "/{doctor_id}")
     ResponseEntity<DoctorDTO> getDoctorById(@PathVariable("doctor_id") Long id) {
         logger.info("Received request to retrieve doctor by ID: {}", id);
-        DoctorDTO doctorDTO = doctorService.getDoctorById(id);
+        DoctorDTO doctorDTO = doctorService.getDoctorDtoById(id);
         logger.info("Retrieved doctor successfully. ID: {}", id);
         return ResponseEntity.ok(doctorDTO);
     }
@@ -91,7 +91,7 @@ public class DoctorController {
     @GetMapping("/show-appointments")
     ResponseEntity<Page<AppointmentDTO>> getAllAppointments(@RequestParam(defaultValue = "10") int size) {
         logger.info("Received request to retrieve all appointments. Size: {}", size);
-        Page<AppointmentDTO> appointments = appointmentService.getAllAppointments(size);
+        Page<AppointmentDTO> appointments = appointmentService.getAllAppointmentsDto(size);
         logger.info("Retrieved {} appointments successfully.", appointments.getTotalElements());
         return ResponseEntity.ok(appointments);    }
 }

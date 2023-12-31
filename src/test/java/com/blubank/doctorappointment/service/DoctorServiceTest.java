@@ -43,7 +43,7 @@ class DoctorServiceTest {
         int size = 10;
         Pageable pageable = Pageable.ofSize(size);
         // When
-        underTest.getAllDoctors(size);
+        underTest.getAllDoctorsDto(size);
         // Then
         verify(doctorRepository).findAll(pageable);
     }

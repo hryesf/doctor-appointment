@@ -38,6 +38,7 @@ public class PatientService {
                 .orElseThrow(() -> new NotFoundException("Patient with id = " + id + " not found!")));
     }
 
+
     public PatientDTO getPatientDtoByPhoneNumber(String phoneNumber) {
         return patientConverter.toDto(patientRepository.findPatientByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new NotFoundException("Patient with phone number \"" + phoneNumber + "\" not Found")));

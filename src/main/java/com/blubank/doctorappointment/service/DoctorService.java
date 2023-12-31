@@ -38,6 +38,7 @@ public class DoctorService {
                 .orElseThrow(() -> new NotFoundException("Doctor with id = " + id + " not found!")));
     }
 
+
     public DoctorDTO saveDoctor(Doctor doctor) {
         String medicalCode = doctor.getMedicalCode();
         String fullName = doctor.getFullName();

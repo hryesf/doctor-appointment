@@ -42,6 +42,7 @@ public class AppointmentService {
         this.appointmentConverter = appointmentConverter;
     }
 
+
     public Page<AppointmentDTO> getAllAppointmentsDto(int size) {
         Pageable pageable = Pageable.ofSize(size);
         return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findAll(pageable));
