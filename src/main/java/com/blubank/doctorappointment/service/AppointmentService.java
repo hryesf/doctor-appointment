@@ -117,7 +117,7 @@ public class AppointmentService {
 
         } catch (OptimisticLockingFailureException e) {
             logger.error("Optimistic locking failure for taking an appointment with id: {}", appointmentId);
-            return "Appointment with id = " + appointmentId + " can not remove from the list! \nPlease try again later.";
+            throw new OptimisticLockingFailureException("Optimistic locking failure for taking an appointment with id: " + appointmentId);
         }
     }
 
