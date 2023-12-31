@@ -42,7 +42,6 @@ public class AppointmentService {
         this.appointmentConverter = appointmentConverter;
     }
 
-
     public Page<AppointmentDTO> getAllAppointmentsDto(int size) {
         Pageable pageable = Pageable.ofSize(size);
         return appointmentConverter.AppointmentDTOPaginated(appointmentRepository.findAll(pageable));
@@ -100,11 +99,9 @@ public class AppointmentService {
 
         } catch (OptimisticLockingFailureException e) {
             logger.error("Optimistic locking failure for taking an appointment with id: {}", appointmentId);
-            throw e;
+            throw new OptimisticLockingFailureException("Optimistic locking failure for taking an appointment with id: " + appointmentId);
         }
-
     }
-
 
     public String deleteAppointmentById(Long appointmentId) {
         Appointment appointment = getAppointmentById(appointmentId);
