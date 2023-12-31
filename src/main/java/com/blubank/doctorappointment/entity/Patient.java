@@ -41,6 +41,11 @@ public class Patient extends BaseEntity{
             orphanRemoval = true)
     private Set<Appointment> appointmentList = new HashSet<>();
 
+    public Patient(String fullName, String phoneNumber) {
+        this.fullName = fullName;
+        this.phoneNumber = phoneNumber;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
