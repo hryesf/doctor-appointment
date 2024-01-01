@@ -14,7 +14,7 @@
 - [x] Hibernate
 
 - [x] H2 Database
-- [ ] 
+
 - [x] Swagger Doc
 
 ## Getting Started
