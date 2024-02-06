@@ -15,6 +15,7 @@
 
 - [x] H2 Database
 
+- [x] Swagger Doc
 
 ## Getting Started
 1. Clone the repository: `git clone https://github.com/hryesf/doctor-appointment`
