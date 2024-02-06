@@ -10,7 +10,7 @@ package com.blubank.doctorappointment.protos;
 public final class Doctor extends
     com.google.protobuf.GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:com.blubank.doctorappointment.Doctor)
-        com.blubank.doctorappointment.protos.DoctorOrBuilder {
+    DoctorOrBuilder {
 private static final long serialVersionUID = 0L;
   // Use Doctor.newBuilder() to construct.
   private Doctor(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
@@ -30,13 +30,13 @@ private static final long serialVersionUID = 0L;
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.blubank.doctorappointment.protos.DoctorProtos.internal_static_com_blubank_doctorappointment_Doctor_descriptor;
+    return com.blubank.doctorappointment.protos.DoctorProto.internal_static_com_blubank_doctorappointment_Doctor_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.blubank.doctorappointment.protos.DoctorProtos.internal_static_com_blubank_doctorappointment_Doctor_fieldAccessorTable
+    return com.blubank.doctorappointment.protos.DoctorProto.internal_static_com_blubank_doctorappointment_Doctor_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             com.blubank.doctorappointment.protos.Doctor.class, com.blubank.doctorappointment.protos.Doctor.Builder.class);
   }
@@ -55,7 +55,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       fullName_ = s;
@@ -71,7 +71,7 @@ private static final long serialVersionUID = 0L;
       getFullNameBytes() {
     java.lang.Object ref = fullName_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       fullName_ = b;
@@ -94,7 +94,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       medicalCode_ = s;
@@ -110,7 +110,7 @@ private static final long serialVersionUID = 0L;
       getMedicalCodeBytes() {
     java.lang.Object ref = medicalCode_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       medicalCode_ = b;
@@ -337,13 +337,13 @@ private static final long serialVersionUID = 0L;
       com.blubank.doctorappointment.protos.DoctorOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.blubank.doctorappointment.protos.DoctorProtos.internal_static_com_blubank_doctorappointment_Doctor_descriptor;
+      return com.blubank.doctorappointment.protos.DoctorProto.internal_static_com_blubank_doctorappointment_Doctor_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.blubank.doctorappointment.protos.DoctorProtos.internal_static_com_blubank_doctorappointment_Doctor_fieldAccessorTable
+      return com.blubank.doctorappointment.protos.DoctorProto.internal_static_com_blubank_doctorappointment_Doctor_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.blubank.doctorappointment.protos.Doctor.class, com.blubank.doctorappointment.protos.Doctor.Builder.class);
     }
@@ -381,7 +381,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.blubank.doctorappointment.protos.DoctorProtos.internal_static_com_blubank_doctorappointment_Doctor_descriptor;
+      return com.blubank.doctorappointment.protos.DoctorProto.internal_static_com_blubank_doctorappointment_Doctor_descriptor;
     }
 
     @java.lang.Override
@@ -566,7 +566,7 @@ private static final long serialVersionUID = 0L;
         getFullNameBytes() {
       java.lang.Object ref = fullName_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         fullName_ = b;
@@ -638,7 +638,7 @@ private static final long serialVersionUID = 0L;
         getMedicalCodeBytes() {
       java.lang.Object ref = medicalCode_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         medicalCode_ = b;
@@ -793,7 +793,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Timestamp created_at = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>
+        com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
         getCreatedAtFieldBuilder() {
       if (createdAtBuilder_ == null) {
         createdAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

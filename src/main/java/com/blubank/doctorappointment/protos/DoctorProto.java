@@ -4,8 +4,8 @@
 // Protobuf Java Version: 3.25.2
 package com.blubank.doctorappointment.protos;
 
-public final class DoctorProtos {
-  private DoctorProtos() {}
+public final class DoctorProto {
+  private DoctorProto() {}
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
@@ -17,7 +17,7 @@ public final class DoctorProtos {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_blubank_doctorappointment_Doctor_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_com_blubank_doctorappointment_Doctor_fieldAccessorTable;
 
@@ -33,9 +33,8 @@ public final class DoctorProtos {
       "tment\032\037google/protobuf/timestamp.proto\"a" +
       "\n\006Doctor\022\021\n\tfull_name\030\001 \001(\t\022\024\n\014medical_c" +
       "ode\030\002 \001(\t\022.\n\ncreated_at\030\003 \001(\0132\032.google.p" +
-      "rotobuf.TimestampB6\n$com.blubank.doctora" +
-      "ppointment.protosB\014DoctorProtosP\001b\006proto" +
-      "3"
+      "rotobuf.TimestampB5\n$com.blubank.doctora" +
+      "ppointment.protosB\013DoctorProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
