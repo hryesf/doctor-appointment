@@ -6,7 +6,7 @@ package com.blubank.doctorappointment;
 
 option java_multiple_files = true;
 option java_package = "com.blubank.doctorappointment.protos";
-option java_outer_classname = "DoctorProtos";
+option java_outer_classname = "DoctorProto";
 
 message Doctor {
   string full_name = 1;
