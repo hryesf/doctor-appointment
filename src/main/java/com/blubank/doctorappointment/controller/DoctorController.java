@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -56,32 +55,6 @@ public class DoctorController {
         DoctorDTO savedDoctor = doctorService.saveDoctor(newDoctor);
         logger.info("Saved new doctor successfully.");
         return ResponseEntity.ok(savedDoctor);
-    }
-
-
-    // protobuf output
-    @PostMapping(produces = {"application/x-protobuf"}) // Set the response content type to Protobuf
-    public ResponseEntity<com.blubank.doctorappointment.protos.Doctor> saveDoctorProtobuf(@Valid @RequestBody @NotNull Doctor newDoctor) {
-        logger.info("Received request to save a new doctor.");
-
-        try {
-
-            // Invoke service method with Protobuf object
-            DoctorDTO savedDoctorDTO = doctorService.saveDoctor(newDoctor);
-
-            // Convert DTO to Protobuf message
-            com.blubank.doctorappointment.protos.Doctor savedDoctorProto = com.blubank.doctorappointment.protos.Doctor.newBuilder()
-                    .setFullName(savedDoctorDTO.getFullName())
-                    .setMedicalCode(savedDoctorDTO.getMedicalCode())
-                    //.setCreatedAt((com.google.protobuf.Timestamp)Timestamp.valueOf(savedDoctorDTO.getCreatedAt()))
-                    .build();
-
-            logger.info("Saved new doctor successfully.");
-            return ResponseEntity.ok(savedDoctorProto);
-        } catch (Exception e) {
-            logger.error("Error processing request", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
     }
 
     @DeleteMapping(path = "/{doctor_id}")
